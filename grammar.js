@@ -358,7 +358,7 @@ module.exports = grammar(C, {
       repeat($.attribute),
       optional($.virtual_function_specifier),
       $.declaration_specifiers,
-      commaSep(field('declarator', $._field_declarator)),
+      commaSep(field('declarator', $.field_declarator)),
       optional(choice(
         $.bitfield_clause,
         field('default_value', $.initializer_list),
@@ -371,7 +371,7 @@ module.exports = grammar(C, {
       repeat($.attribute),
       optional($.virtual_function_specifier),
       $.declaration_specifiers,
-      field('declarator', $._field_declarator),
+      field('declarator', $.field_declarator),
       choice(
         field('body', $.enclosed_body),
         $.default_method_clause,
@@ -461,7 +461,7 @@ module.exports = grammar(C, {
       $.structured_binding_declarator
     ),
 
-    _field_declarator: ($, original) => choice(
+    field_declarator: ($, original) => choice(
       original,
       alias($.reference_field_declarator, $.reference_declarator),
       $.template_method,
@@ -474,7 +474,7 @@ module.exports = grammar(C, {
     ),
 
     reference_declarator: $ => prec.dynamic(1, prec.right(seq(choice('&', '&&'), $._declarator))),
-    reference_field_declarator: $ => prec.dynamic(1, prec.right(seq(choice('&', '&&'), $._field_declarator))),
+    reference_field_declarator: $ => prec.dynamic(1, prec.right(seq(choice('&', '&&'), $.field_declarator))),
     abstract_reference_declarator: $ => prec.right(seq(choice('&', '&&'), optional($._abstract_declarator))),
 
     structured_binding_declarator: $ => prec.dynamic(PREC.STRUCTURED_BINDING, seq(
