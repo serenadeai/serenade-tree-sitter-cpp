@@ -27,7 +27,7 @@ module.exports = grammar(C, {
     [$.parameter_list_block, $.argument_list_block],
     [$._type_specifier, $.call_expression],
     [$.declaration_specifier, $.operator_cast_declaration, $.operator_cast_definition, $.constructor_or_destructor_definition],
-    [$.declaration_specifier, $._constructor_specifiers],
+    [$.declaration_specifier, $.constructor_specifiers],
   ]),
 
   inline: ($, original) => original.concat([
@@ -389,7 +389,7 @@ module.exports = grammar(C, {
       )
     ),
 
-    _constructor_specifiers: $ => repeat1(
+    constructor_specifiers: $ => repeat1(
       prec.right(choice(
         $.storage_class_specifier,
         $.type_qualifier,
@@ -400,7 +400,7 @@ module.exports = grammar(C, {
     ),
 
     operator_cast_definition: $ => seq(
-      optional($._constructor_specifiers),
+      optional_with_placeholder('modifier_list', $.constructor_specifiers),
       field('declarator', $.operator_cast),
       choice(
         field('body', $.enclosed_body),
@@ -410,14 +410,14 @@ module.exports = grammar(C, {
     ),
 
     operator_cast_declaration: $ => prec(1, seq(
-      optional($._constructor_specifiers),
+      optional_with_placeholder('modifier_list', $.constructor_specifiers),
       field('declarator', $.operator_cast),
       optional(seq('=', field('default_value', $._expression))),
       ';'
     )),
 
     constructor_or_destructor_definition: $ => seq(
-      optional($._constructor_specifiers),
+      optional_with_placeholder('modifier_list', $.constructor_specifiers),
       field('declarator', $.function_declarator),
       optional($.field_initializer_list),
       choice(
@@ -428,7 +428,7 @@ module.exports = grammar(C, {
     ),
 
     constructor_or_destructor_declaration: $ => seq(
-      optional($._constructor_specifiers),
+      optional_with_placeholder('modifier_list', $.constructor_specifiers),
       field('declarator', $.function_declarator),
       ';'
     ),
@@ -619,7 +619,6 @@ module.exports = grammar(C, {
 
     statement: ($, original) => choice(
       original,
-      $.for_range_loop,
       $.try_statement,
       $.throw_statement,
     ),
@@ -662,13 +661,17 @@ module.exports = grammar(C, {
       )
     ),
 
-    for_range_loop: $ => seq(
+    for: ($, original) => choice(
+      original, 
+      $.for_each_clause
+    ),
+
+    for_each_clause: $ => seq(
       'for',
       '(',
-      $.declaration_specifiers,
-      field('declarator', $._declarator),
+      field('block_iterator', seq($.declaration_specifiers, $._declarator)),
       ':',
-      field('right', choice(
+      field('block_collection', choice(
         $._expression,
         $.initializer_list,
       )),
@@ -676,9 +679,9 @@ module.exports = grammar(C, {
       field('body', $.statement)
     ),
 
-    return_statement: ($, original) => choice(
-      original,
-      seq('return', $.initializer_list, ';')
+    return_value: ($, original) => choice(
+      original, 
+      $.initializer_list
     ),
 
     throw_statement: $ => seq(
