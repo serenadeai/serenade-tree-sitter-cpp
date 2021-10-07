@@ -731,7 +731,7 @@ module.exports = grammar(C, {
     ),
 
     call_expression: ($, original) => choice(original, seq(
-      field('function', $.primitive_type),
+      field('function_', $.primitive_type),
       field('arguments', $.argument_list_block)
     )),
 
