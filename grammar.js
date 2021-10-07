@@ -26,8 +26,8 @@ module.exports = grammar(C, {
     [$._expression, $._declarator, $._type_specifier],
     [$.parameter_list_block, $.argument_list],
     [$._type_specifier, $.call_expression],
-    [$.declaration_specifiers, $.operator_cast_declaration, $.operator_cast_definition, $.constructor_or_destructor_definition],
-    [$.declaration_specifiers, $._constructor_specifiers],
+    [$.declaration_specifier, $.operator_cast_declaration, $.operator_cast_definition, $.constructor_or_destructor_definition],
+    [$.declaration_specifier, $._constructor_specifiers],
   ]),
 
   inline: ($, original) => original.concat([
@@ -178,9 +178,12 @@ module.exports = grammar(C, {
     )),
 
     // The `auto` storage class is removed in C++0x in order to allow for the `auto` type.
-    storage_class_specifier: ($, original) => choice(
-      ...original.members.filter(member => member.value !== 'auto')
-    ),
+    storage_class_specifier: $ => field('modifier', choice(
+      'extern',
+      'static',
+      'register',
+      'inline'
+    )),
 
     auto: $ => 'auto',
 

@@ -1929,32 +1929,52 @@
         }
       ]
     },
+    "declaration_specifier": {
+      "type": "CHOICE",
+      "members": [
+        {
+          "type": "SYMBOL",
+          "name": "storage_class_specifier"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "type_qualifier"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "attribute_specifier"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "ms_declspec_modifier"
+        }
+      ]
+    },
     "declaration_specifiers": {
       "type": "SEQ",
       "members": [
         {
-          "type": "REPEAT",
-          "content": {
-            "type": "CHOICE",
-            "members": [
-              {
-                "type": "SYMBOL",
-                "name": "storage_class_specifier"
-              },
-              {
-                "type": "SYMBOL",
-                "name": "type_qualifier"
-              },
-              {
-                "type": "SYMBOL",
-                "name": "attribute_specifier"
-              },
-              {
-                "type": "SYMBOL",
-                "name": "ms_declspec_modifier"
+          "type": "CHOICE",
+          "members": [
+            {
+              "type": "FIELD",
+              "name": "modifier_list",
+              "content": {
+                "type": "REPEAT",
+                "content": {
+                  "type": "SYMBOL",
+                  "name": "declaration_specifier"
+                }
               }
-            ]
-          }
+            },
+            {
+              "type": "FIELD",
+              "name": "modifier_list",
+              "content": {
+                "type": "BLANK"
+              }
+            }
+          ]
         },
         {
           "type": "FIELD",
@@ -1965,28 +1985,27 @@
           }
         },
         {
-          "type": "REPEAT",
-          "content": {
-            "type": "CHOICE",
-            "members": [
-              {
-                "type": "SYMBOL",
-                "name": "storage_class_specifier"
-              },
-              {
-                "type": "SYMBOL",
-                "name": "type_qualifier"
-              },
-              {
-                "type": "SYMBOL",
-                "name": "attribute_specifier"
-              },
-              {
-                "type": "SYMBOL",
-                "name": "ms_declspec_modifier"
+          "type": "CHOICE",
+          "members": [
+            {
+              "type": "FIELD",
+              "name": "modifier_list",
+              "content": {
+                "type": "REPEAT",
+                "content": {
+                  "type": "SYMBOL",
+                  "name": "declaration_specifier"
+                }
               }
-            ]
-          }
+            },
+            {
+              "type": "FIELD",
+              "name": "modifier_list",
+              "content": {
+                "type": "BLANK"
+              }
+            }
+          ]
         }
       ]
     },
@@ -2029,46 +2048,54 @@
       ]
     },
     "attribute_specifier": {
-      "type": "SEQ",
-      "members": [
-        {
-          "type": "STRING",
-          "value": "__attribute__"
-        },
-        {
-          "type": "STRING",
-          "value": "("
-        },
-        {
-          "type": "SYMBOL",
-          "name": "argument_list"
-        },
-        {
-          "type": "STRING",
-          "value": ")"
-        }
-      ]
+      "type": "FIELD",
+      "name": "modifier",
+      "content": {
+        "type": "SEQ",
+        "members": [
+          {
+            "type": "STRING",
+            "value": "__attribute__"
+          },
+          {
+            "type": "STRING",
+            "value": "("
+          },
+          {
+            "type": "SYMBOL",
+            "name": "argument_list"
+          },
+          {
+            "type": "STRING",
+            "value": ")"
+          }
+        ]
+      }
     },
     "ms_declspec_modifier": {
-      "type": "SEQ",
-      "members": [
-        {
-          "type": "STRING",
-          "value": "__declspec"
-        },
-        {
-          "type": "STRING",
-          "value": "("
-        },
-        {
-          "type": "SYMBOL",
-          "name": "identifier"
-        },
-        {
-          "type": "STRING",
-          "value": ")"
-        }
-      ]
+      "type": "FIELD",
+      "name": "modifier",
+      "content": {
+        "type": "SEQ",
+        "members": [
+          {
+            "type": "STRING",
+            "value": "__declspec"
+          },
+          {
+            "type": "STRING",
+            "value": "("
+          },
+          {
+            "type": "SYMBOL",
+            "name": "identifier"
+          },
+          {
+            "type": "STRING",
+            "value": ")"
+          }
+        ]
+      }
     },
     "ms_based_modifier": {
       "type": "SEQ",
@@ -3243,49 +3270,57 @@
       }
     },
     "storage_class_specifier": {
-      "type": "CHOICE",
-      "members": [
-        {
-          "type": "STRING",
-          "value": "extern"
-        },
-        {
-          "type": "STRING",
-          "value": "static"
-        },
-        {
-          "type": "STRING",
-          "value": "register"
-        },
-        {
-          "type": "STRING",
-          "value": "inline"
-        }
-      ]
+      "type": "FIELD",
+      "name": "modifier",
+      "content": {
+        "type": "CHOICE",
+        "members": [
+          {
+            "type": "STRING",
+            "value": "extern"
+          },
+          {
+            "type": "STRING",
+            "value": "static"
+          },
+          {
+            "type": "STRING",
+            "value": "register"
+          },
+          {
+            "type": "STRING",
+            "value": "inline"
+          }
+        ]
+      }
     },
     "type_qualifier": {
       "type": "CHOICE",
       "members": [
         {
-          "type": "CHOICE",
-          "members": [
-            {
-              "type": "STRING",
-              "value": "const"
-            },
-            {
-              "type": "STRING",
-              "value": "volatile"
-            },
-            {
-              "type": "STRING",
-              "value": "restrict"
-            },
-            {
-              "type": "STRING",
-              "value": "_Atomic"
-            }
-          ]
+          "type": "FIELD",
+          "name": "modifier",
+          "content": {
+            "type": "CHOICE",
+            "members": [
+              {
+                "type": "STRING",
+                "value": "const"
+              },
+              {
+                "type": "STRING",
+                "value": "volatile"
+              },
+              {
+                "type": "STRING",
+                "value": "restrict"
+              },
+              {
+                "type": "STRING",
+                "value": "_Atomic"
+              }
+            ]
+          }
         },
         {
           "type": "STRING",
@@ -10635,13 +10670,13 @@
       "call_expression"
     ],
     [
-      "declaration_specifiers",
+      "declaration_specifier",
       "operator_cast_declaration",
       "operator_cast_definition",
       "constructor_or_destructor_definition"
     ],
     [
-      "declaration_specifiers",
+      "declaration_specifier",
       "_constructor_specifiers"
     ]
   ],
