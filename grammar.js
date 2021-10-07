@@ -24,10 +24,15 @@ module.exports = grammar(C, {
     [$._expression, $._declarator],
     [$._expression, $.structured_binding_declarator],
     [$._expression, $._declarator, $._type_specifier],
-    [$.parameter_list, $.argument_list],
-    [$._type_specifier, $.call_expression],
-    [$._declaration_specifiers, $.operator_cast_declaration, $.operator_cast_definition, $.constructor_or_destructor_definition],
-    [$._declaration_specifiers, $._constructor_specifiers],
+    [$.parameter_list_block, $.argument_list_block],
+    [$._type_specifier, $.call],
+    [$.declaration_specifier, $.operator_cast_declaration, $.operator_cast_definition, $.constructor_or_destructor_definition],
+    [$.declaration_specifier, $.constructor_specifiers],
+
+    [$.class_specifier_name, $.class_specifier_optional_name],
+    // [$._expression, $.compound_literal_expression],
+    // `_expression`, `compound_literal_expression`
+
   ]),
 
   inline: ($, original) => original.concat([
@@ -35,18 +40,18 @@ module.exports = grammar(C, {
   ]),
 
   rules: {
-    _top_level_item: ($, original) => choice(
+    top_level_item: ($, original) => field('statement', choice(
       original,
-      $.namespace_definition,
+      $.namespace,
       $.using_declaration,
       $.alias_declaration,
       $.static_assert_declaration,
       $.template_declaration,
       $.template_instantiation,
-      alias($.constructor_or_destructor_definition, $.function_definition),
-      alias($.operator_cast_definition, $.function_definition),
-      alias($.operator_cast_declaration, $.declaration),
-    ),
+      $.constructor_or_destructor_definition,
+      $.operator_cast_definition,
+      $.operator_cast_declaration,
+    )),
 
     // Types
 
@@ -60,7 +65,7 @@ module.exports = grammar(C, {
     _type_specifier: $ => choice(
       $.struct_specifier,
       $.union_specifier,
-      $.enum_specifier,
+      $.enum,
       $.class_specifier,
       $.sized_type_specifier,
       $.primitive_type,
@@ -74,40 +79,43 @@ module.exports = grammar(C, {
       ))
     ),
 
-    type_qualifier: ($, original) => choice(
+    type_qualifier: ($, original) => field('modifier', choice(
       original,
       'mutable',
       'constexpr'
-    ),
+    )),
 
     // When used in a trailing return type, these specifiers can now occur immediately before
     // a compound statement. This introduces a shift/reduce conflict that needs to be resolved
     // with an associativity.
+    class_specifier_name: $ => seq(
+      $._class_name, 
+      optional_with_placeholder('modifier_list', '!!UNMATCHABLE_276b0e63'),
+      optional_with_placeholder('extends_list_optional', '!!UNMATCHABLE_03198f13'),
+    ),
+
+    class_specifier_optional_name: $ => seq(
+      optional($._class_name), 
+      optional_with_placeholder('modifier_list', $.virtual_specifier),
+      optional_with_placeholder('extends_list_optional', $.base_class_clause),
+      field('brace_enclosed_body', $.field_declaration_list)
+    ),
+
     class_specifier: $ => prec.right(seq(
       'class',
       optional($.ms_declspec_modifier),
       choice(
-        field('name', $._class_name),
-        seq(
-          optional(field('name', $._class_name)),
-          optional($.virtual_specifier),
-          optional($.base_class_clause),
-          field('body', $.field_declaration_list)
-        )
-      )
+        $.class_specifier_name, 
+        $.class_specifier_optional_name
+      ), 
     )),
 
     union_specifier: $ => prec.right(seq(
       'union',
       optional($.ms_declspec_modifier),
       choice(
-        field('name', $._class_name),
-        seq(
-          optional(field('name', $._class_name)),
-          optional($.virtual_specifier),
-          optional($.base_class_clause),
-          field('body', $.field_declaration_list)
-        )
+        $.class_specifier_name, 
+        $.class_specifier_optional_name
       )
     )),
 
@@ -115,13 +123,8 @@ module.exports = grammar(C, {
       'struct',
       optional($.ms_declspec_modifier),
       choice(
-        field('name', $._class_name),
-        seq(
-          optional(field('name', $._class_name)),
-          optional($.virtual_specifier),
-          optional($.base_class_clause),
-          field('body', $.field_declaration_list)
-        )
+        $.class_specifier_name, 
+        $.class_specifier_optional_name
       )
     )),
 
@@ -131,14 +134,14 @@ module.exports = grammar(C, {
       $.template_type
     )),
 
-    virtual_specifier: $ => choice(
+    virtual_specifier: $ => field('modifier', choice(
       'final', // the only legal value here for classes
       'override' // legal for functions in addition to final, plus permutations.
-    ),
+    )),
 
-    virtual_function_specifier: $ => choice(
+    virtual_function_specifier: $ => field('modifier', choice(
       'virtual'
-    ),
+    )),
 
     explicit_function_specifier: $ => choice(
       'explicit',
@@ -152,23 +155,25 @@ module.exports = grammar(C, {
 
     base_class_clause: $ => seq(
       ':',
-      commaSep1(seq(
-        optional(choice('public', 'private', 'protected')),
-        $._class_name,
-        optional('...')
-      ))
+      field('extends_list', commaSep1($.extends_type))
+    ),
+    
+    extends_type: $ => seq(
+      optional(choice('public', 'private', 'protected')),
+      $._class_name,
+      optional('...')
     ),
 
-    enum_specifier: $ => prec.left(seq(
+    enum: $ => prec.left(seq(
       'enum',
       optional(choice('class', 'struct')),
       choice(
         seq(
           field('name', $._class_name),
           optional($._enum_base_clause),
-          optional(field('body', $.enumerator_list))
+          optional(field('brace_enclosed_body', $.enumerator_list))
         ),
-        field('body', $.enumerator_list)
+        field('brace_enclosed_body', $.enumerator_list)
       )
     )),
 
@@ -178,9 +183,12 @@ module.exports = grammar(C, {
     )),
 
     // The `auto` storage class is removed in C++0x in order to allow for the `auto` type.
-    storage_class_specifier: ($, original) => choice(
-      ...original.members.filter(member => member.value !== 'auto')
-    ),
+    storage_class_specifier: $ => field('modifier', choice(
+      'extern',
+      'static',
+      'register',
+      'inline'
+    )),
 
     auto: $ => 'auto',
 
@@ -196,7 +204,7 @@ module.exports = grammar(C, {
       original
     ),
 
-    declaration: ($, original) => seq(
+    declaration_without_semicolon: ($, original) => seq(
       repeat($.attribute),
       original
     ),
@@ -205,21 +213,21 @@ module.exports = grammar(C, {
       'template',
       field('parameters', $.template_parameter_list),
       choice(
-        $._empty_declaration,
+        $.empty_declaration,
         $.alias_declaration,
         $.declaration,
         $.template_declaration,
         $.function_definition,
-        alias($.constructor_or_destructor_declaration, $.declaration),
-        alias($.constructor_or_destructor_definition, $.function_definition),
-        alias($.operator_cast_declaration, $.declaration),
-        alias($.operator_cast_definition, $.function_definition),
+        $.constructor_or_destructor_declaration,
+        $.constructor_or_destructor_definition,
+        $.operator_cast_declaration,
+        $.operator_cast_definition,
       )
     ),
 
     template_instantiation: $ => seq(
       'template',
-      optional($._declaration_specifiers),
+      optional($.declaration_specifiers),
       field('declarator', $._declarator),
       ';'
     ),
@@ -271,26 +279,24 @@ module.exports = grammar(C, {
       )
     ),
 
-    parameter_list: $ => seq(
-      '(',
-      commaSep(choice(
+    parameter_list: $ => commaSep1(
+      field('parameter', choice(
         $.parameter_declaration,
         $.optional_parameter_declaration,
         $.variadic_parameter_declaration,
         '...'
-      )),
-      ')'
+      ))
     ),
 
     optional_parameter_declaration: $ => seq(
-      $._declaration_specifiers,
+      $.declaration_specifiers,
       field('declarator', optional($._declarator)),
       '=',
       field('default_value', $._expression)
     ),
 
     variadic_parameter_declaration: $ => seq(
-      $._declaration_specifiers,
+      $.declaration_specifiers,
       field('declarator', choice(
         $.variadic_declarator,
         alias($.variadic_reference_declarator, $.reference_declarator)
@@ -307,15 +313,17 @@ module.exports = grammar(C, {
       $.variadic_declarator
     ),
 
+    list_declarator: $ => seq(
+      field('assignment_variable', $._declarator),
+      field('assignment_value', choice(
+        $.argument_list_block,
+        $.initializer_list
+      ))
+    ),
+
     init_declarator: ($, original) => choice(
       original,
-      seq(
-        field('declarator', $._declarator),
-        field('value', choice(
-          $.argument_list,
-          $.initializer_list
-        ))
-      )
+      $.list_declarator
     ),
 
     operator_cast: $ => prec(1, seq(
@@ -328,13 +336,13 @@ module.exports = grammar(C, {
         '::',
       )),
       'operator',
-      $._declaration_specifiers,
+      $.declaration_specifiers,
       field('declarator', $._abstract_declarator),
     )),
 
     // Avoid ambiguity between compound statement and initializer list in a construct like:
     //   A b {};
-    compound_statement: ($, original) => prec(-1, original),
+    brace_enclosed_body: ($, original) => prec(-1, original),
 
     field_initializer_list: $ => seq(
       ':',
@@ -343,18 +351,18 @@ module.exports = grammar(C, {
 
     field_initializer: $ => prec(1, seq(
       choice($._field_identifier, $.scoped_field_identifier),
-      choice($.initializer_list, $.argument_list),
+      choice($.initializer_list, $.argument_list_block),
       optional('...')
     )),
 
     _field_declaration_list_item: ($, original) => choice(
       original,
       $.template_declaration,
-      alias($.inline_method_definition, $.function_definition),
-      alias($.constructor_or_destructor_definition, $.function_definition),
-      alias($.constructor_or_destructor_declaration, $.declaration),
-      alias($.operator_cast_definition, $.function_definition),
-      alias($.operator_cast_declaration, $.declaration),
+      $.inline_method_definition,
+      $.constructor_or_destructor_definition,
+      $.constructor_or_destructor_declaration,
+      $.operator_cast_definition,
+      $.operator_cast_declaration,
       $.friend_declaration,
       $.access_specifier,
       $.alias_declaration,
@@ -363,32 +371,44 @@ module.exports = grammar(C, {
       $.static_assert_declaration
     ),
 
-    field_declaration: $ => seq(
+    property: $ => seq(
       repeat($.attribute),
       optional($.virtual_function_specifier),
-      $._declaration_specifiers,
-      commaSep(field('declarator', $._field_declarator)),
-      optional(choice(
-        $.bitfield_clause,
-        field('default_value', $.initializer_list),
-        seq('=', field('default_value', choice($._expression, $.initializer_list)))
-      )),
+      $.declaration_specifiers,
+      optional_with_placeholder('assignment_list', $.property_assignment_list),
       ';'
     ),
+
+    property_assignment_list: $ => commaSep1(
+      field('assignment', $.property_assignment)
+    ),
+
+    property_assignment: $ => seq(
+      field('assignment_variable', $.field_declarator), 
+      optional_with_placeholder('assignment_value_list_optional', 
+        alias($.property_assignment_value, $.assignment_value)
+      )
+    ),
+
+    property_assignment_value: $ => choice(
+      $.bitfield_clause,
+      field('default_value', $.initializer_list),
+      seq('=', field('default_value', choice($._expression, $.initializer_list)))
+    ), 
 
     inline_method_definition: $ => seq(
       repeat($.attribute),
       optional($.virtual_function_specifier),
-      $._declaration_specifiers,
-      field('declarator', $._field_declarator),
+      $.declaration_specifiers,
+      field('declarator', $.field_declarator),
       choice(
-        field('body', $.compound_statement),
+        field('body', $.brace_enclosed_body),
         $.default_method_clause,
         $.delete_method_clause
       )
     ),
 
-    _constructor_specifiers: $ => repeat1(
+    constructor_specifiers: $ => repeat1(
       prec.right(choice(
         $.storage_class_specifier,
         $.type_qualifier,
@@ -398,36 +418,38 @@ module.exports = grammar(C, {
       ))
     ),
 
+    // constructor_specifier: $ => 
+
     operator_cast_definition: $ => seq(
-      optional($._constructor_specifiers),
+      optional_with_placeholder('modifier_list', $.constructor_specifiers),
       field('declarator', $.operator_cast),
       choice(
-        field('body', $.compound_statement),
+        field('body', $.brace_enclosed_body),
         $.default_method_clause,
         $.delete_method_clause
       )
     ),
 
     operator_cast_declaration: $ => prec(1, seq(
-      optional($._constructor_specifiers),
+      optional_with_placeholder('modifier_list', $.constructor_specifiers),
       field('declarator', $.operator_cast),
       optional(seq('=', field('default_value', $._expression))),
       ';'
     )),
 
     constructor_or_destructor_definition: $ => seq(
-      optional($._constructor_specifiers),
+      optional_with_placeholder('modifier_list', $.constructor_specifiers),
       field('declarator', $.function_declarator),
       optional($.field_initializer_list),
       choice(
-        field('body', $.compound_statement),
+        field('body', $.brace_enclosed_body),
         $.default_method_clause,
         $.delete_method_clause
       )
     ),
 
     constructor_or_destructor_declaration: $ => seq(
-      optional($._constructor_specifiers),
+      optional_with_placeholder('modifier_list', $.constructor_specifiers),
       field('declarator', $.function_declarator),
       ';'
     ),
@@ -470,9 +492,16 @@ module.exports = grammar(C, {
       $.structured_binding_declarator
     ),
 
-    _field_declarator: ($, original) => choice(
+    // assignment: ($, original) => choice(
+    //   original, 
+    //   $.reference_declarator, 
+    //   // $.scoped_identifier, TODO: Do we need this?
+    // ),
+
+
+    field_declarator: ($, original) => choice(
       original,
-      alias($.reference_field_declarator, $.reference_declarator),
+      $.reference_field_declarator,
       $.template_method,
       $.operator_name
     ),
@@ -483,43 +512,48 @@ module.exports = grammar(C, {
     ),
 
     reference_declarator: $ => prec.dynamic(1, prec.right(seq(choice('&', '&&'), $._declarator))),
-    reference_field_declarator: $ => prec.dynamic(1, prec.right(seq(choice('&', '&&'), $._field_declarator))),
+    reference_field_declarator: $ => prec.dynamic(1, prec.right(seq(choice('&', '&&'), $.field_declarator))),
     abstract_reference_declarator: $ => prec.right(seq(choice('&', '&&'), optional($._abstract_declarator))),
 
     structured_binding_declarator: $ => prec.dynamic(PREC.STRUCTURED_BINDING, seq(
       '[', commaSep1($.identifier), ']'
     )),
 
+    // serenade note: Moved trailing return type out of the function modifier list. 
+    // not sure if it's technically allowed to have these in any order, or if this
+    // was just a simplification to the grammar. Also don't allow repeated 
+    // trailing return type. 
     function_declarator: ($, original) => prec.dynamic(1, seq(
       original,
-      repeat(choice(
+      optional_with_placeholder('function_modifier_list', repeat(choice(
         $.type_qualifier,
         $.virtual_specifier,
         $.noexcept,
-        $.throw_specifier,
-        $.trailing_return_type
-      ))
+        $.throw_specifier
+      ))), 
+      optional_with_placeholder('return_type_optional', $.trailing_return_type),
     )),
 
+    // see comment for function_declarator. 
     function_field_declarator: ($, original) => prec.dynamic(1, seq(
       original,
-      repeat(choice(
+      optional_with_placeholder('function_modifier_list', repeat(choice(
         $.type_qualifier,
         $.virtual_specifier,
         $.noexcept,
-        $.throw_specifier,
-        $.trailing_return_type
-      ))
+        $.throw_specifier
+      ))), 
+      optional_with_placeholder('return_type_optional', $.trailing_return_type),
     )),
 
     abstract_function_declarator: ($, original) => prec.right(seq(
       original,
-      repeat(choice(
+      optional_with_placeholder('function_modifier_list', repeat(choice(
         $.type_qualifier,
         $.noexcept,
         $.throw_specifier
-      )),
-      optional($.trailing_return_type)
+      ))),
+      optional_with_placeholder('return_type_optional', $.trailing_return_type),
     )),
 
     trailing_return_type: $ => prec.right(seq(
@@ -529,7 +563,7 @@ module.exports = grammar(C, {
       optional($._abstract_declarator)
     )),
 
-    noexcept: $ => prec.right(seq(
+    noexcept: $ => prec.right(field('modifier', seq(
       'noexcept',
       optional(
         seq(
@@ -538,7 +572,7 @@ module.exports = grammar(C, {
           ')',
         ),
       ),
-    )),
+    ))),
 
     throw_specifier: $ => seq(
       'throw',
@@ -574,10 +608,10 @@ module.exports = grammar(C, {
       alias(token(prec(1, '>')), '>')
     ),
 
-    namespace_definition: $ => seq(
+    namespace: $ => seq(
       'namespace',
       field('name', optional($.identifier)),
-      field('body', $.declaration_list)
+      field('brace_enclosed_body', $.declaration_list)
     ),
 
     using_declaration: $ => seq(
@@ -616,38 +650,17 @@ module.exports = grammar(C, {
 
     // Statements
 
-    _statement: ($, original) => choice(
+    statement: ($, original) => choice(
       original,
-      $.for_range_loop,
-      $.try_statement,
-      $.throw_statement,
+      $.try,
+      $.throw,
     ),
 
-    switch_statement: $ => seq(
-      'switch',
-      field('condition', $.condition_clause),
-      field('body', $.compound_statement)
-    ),
+    if_clause: $ => prec.dynamic(0, 
+      seq('if', optional('constexpr'), '(', $.condition, ')', $.statement),
+    ), 
 
-    while_statement: $ => seq(
-      'while',
-      field('condition', $.condition_clause),
-      field('body', $._statement)
-    ),
-
-    if_statement: $ => prec.right(seq(
-      'if',
-      optional('constexpr'),
-      field('condition', $.condition_clause),
-      field('consequence', $._statement),
-      optional(seq(
-        'else',
-        field('alternative', $._statement)
-      ))
-    )),
-
-    condition_clause: $ => seq(
-      '(',
+    condition: $ => seq(
       choice(
         seq(
           field('initializer', optional(choice(
@@ -659,13 +672,12 @@ module.exports = grammar(C, {
             $.comma_expression
           )),
         ),
-        field('value', alias($.condition_declaration, $.declaration))
+        field('value', $.condition_declaration)
       ),
-      ')',
-    ),
+    ), 
 
     condition_declaration: $ => seq(
-      $._declaration_specifiers,
+      $.declaration_specifiers,
       field('declarator', $._declarator),
       choice(
         seq(
@@ -676,41 +688,56 @@ module.exports = grammar(C, {
       )
     ),
 
-    for_range_loop: $ => seq(
+    for: ($, original) => choice(
+      original, 
+      $.for_each_clause
+    ),
+
+    for_each_clause: $ => seq(
       'for',
       '(',
-      $._declaration_specifiers,
-      field('declarator', $._declarator),
+      field('block_iterator', seq($.declaration_specifiers, $._declarator)),
       ':',
-      field('right', choice(
+      field('block_collection', choice(
         $._expression,
         $.initializer_list,
       )),
       ')',
-      field('body', $._statement)
+      field('body', $.statement)
     ),
 
-    return_statement: ($, original) => choice(
-      original,
-      seq('return', $.initializer_list, ';')
+    return_value: ($, original) => choice(
+      original, 
+      $.initializer_list
     ),
 
-    throw_statement: $ => seq(
+    throw: $ => seq(
       'throw',
       optional($._expression),
       ';'
     ),
 
-    try_statement: $ => seq(
-      'try',
-      field('body', $.compound_statement),
-      repeat1($.catch_clause)
+    try: $ => seq(
+      $.try_clause,
+      field('catch_list', repeat1($.catch)), 
+      optional_with_placeholder("finally_clause_optional", "!!UNMATCHABLE_4b0fd36954db") // Here for Spec purposes. 
     ),
 
-    catch_clause: $ => seq(
+    try_clause: $ => seq(
+      'try',
+      $.brace_enclosed_body
+    ),
+
+    catch_parameter_block: $ => seq(
+      '(',
+      alias($.parameter_list, $.catch_parameter),
+      ')'
+    ),
+
+    catch: $ => seq(
       'catch',
-      field('parameters', $.parameter_list),
-      field('body', $.compound_statement)
+      field('catch_parameter_optional', $.catch_parameter_block),
+      $.brace_enclosed_body
     ),
 
     attribute: $ => seq(
@@ -727,26 +754,26 @@ module.exports = grammar(C, {
       $.scoped_identifier,
       $.new_expression,
       $.delete_expression,
-      $.lambda_expression,
+      $.lambda,
       $.parameter_pack_expansion,
       $.nullptr,
       $.this,
       $.raw_string_literal
     ),
 
-    call_expression: ($, original) => choice(original, seq(
-      field('function', $.primitive_type),
-      field('arguments', $.argument_list)
+    call: ($, original) => choice(original, seq(
+      field('function__', $.primitive_type),
+      field('arguments', $.argument_list_block)
     )),
 
     new_expression: $ => prec.right(PREC.NEW, seq(
       optional('::'),
       'new',
-      field('placement', optional($.argument_list)),
+      field('placement', optional($.argument_list_block)),
       field('type', $._type_specifier),
       field('declarator', optional($.new_declarator)),
       field('arguments', optional(choice(
-        $.argument_list,
+        $.argument_list_block,
         $.initializer_list
       )))
     )),
@@ -779,10 +806,10 @@ module.exports = grammar(C, {
       )
     ),
 
-    lambda_expression: $ => seq(
+    lambda: $ => seq(
       field('captures', $.lambda_capture_specifier),
       optional(field('declarator', $.abstract_function_declarator)),
-      field('body', $.compound_statement)
+      field('body', $.brace_enclosed_body)
     ),
 
     lambda_capture_specifier: $ => prec(PREC.LAMBDA, seq(
@@ -820,13 +847,9 @@ module.exports = grammar(C, {
       ),
     ),
 
-    argument_list: $ => seq(
-      '(',
-      commaSep(choice($._expression, $.initializer_list)),
-      ')'
-    ),
+    argument: $ => choice($._expression, $.initializer_list),
 
-    destructor_name: $ => prec(1, seq('~', $.identifier)),
+    destructor_name: $ => prec(1, field('identifier', seq('~', $.identifier))),
 
     compound_literal_expression: ($, original) => choice(
       original,
@@ -840,53 +863,53 @@ module.exports = grammar(C, {
       )
     ),
 
-    scoped_field_identifier: $ => prec(1, seq(
-      field('namespace', optional(choice(
+    scoped_field_identifier: $ => prec(1, field('identifer', seq(
+      optional(choice(
         $._namespace_identifier,
         $.template_type,
         $.scoped_namespace_identifier
-      ))),
+      )),
       '::',
-      field('name', choice(
+      choice(
         $._field_identifier,
         $.operator_name,
         $.destructor_name
-      ))
-    )),
+      )
+    ))),
 
-    scoped_identifier: $ => prec(1, seq(
-      field('namespace', optional(choice(
+    scoped_identifier: $ => prec(1, field('identifier', seq(
+      optional(choice(
         $._namespace_identifier,
         $.template_type,
         $.scoped_namespace_identifier
-      ))),
+      )),
       '::',
-      field('name', choice(
+      choice(
         $.identifier,
         $.operator_name,
         $.destructor_name
-      ))
-    )),
+      )
+    ))),
 
-    scoped_type_identifier: $ => prec(1, seq(
-      field('namespace', optional(choice(
+    scoped_type_identifier: $ => prec(1, field('identifier', seq(
+      optional(choice(
         $._namespace_identifier,
         $.template_type,
         $.scoped_namespace_identifier
-      ))),
+      )),
       '::',
-      field('name', $._type_identifier)
-    )),
+      $._type_identifier
+    ))),
 
-    scoped_namespace_identifier: $ => prec(2, seq(
-      field('namespace', optional(choice(
+    scoped_namespace_identifier: $ => prec(2, field('identifier', seq(
+      optional(choice(
         $._namespace_identifier,
         $.template_type,
         $.scoped_namespace_identifier
-      ))),
+      )),
       '::',
-      field('name', $._namespace_identifier)
-    )),
+      $._namespace_identifier
+    ))),
 
     _assignment_left_expression: ($, original) => choice(
       original,
@@ -929,4 +952,8 @@ function commaSep(rule) {
 
 function commaSep1(rule) {
   return seq(rule, repeat(seq(',', rule)));
+}
+
+function optional_with_placeholder(field_name, rule) {
+  return choice(field(field_name, rule), field(field_name, blank()));
 }
