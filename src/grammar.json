@@ -3449,7 +3449,7 @@
         },
         {
           "type": "SYMBOL",
-          "name": "enum_specifier"
+          "name": "enum"
         },
         {
           "type": "SYMBOL",
@@ -3656,7 +3656,7 @@
         ]
       }
     },
-    "enum_specifier": {
+    "enum": {
       "type": "PREC_LEFT",
       "value": 0,
       "content": {
@@ -4481,7 +4481,7 @@
         },
         {
           "type": "SYMBOL",
-          "name": "throw_statement"
+          "name": "throw"
         }
       ]
     },
@@ -4646,13 +4646,8 @@
               "type": "FIELD",
               "name": "value",
               "content": {
-                "type": "ALIAS",
-                "content": {
-                  "type": "SYMBOL",
-                  "name": "condition_declaration"
-                },
-                "named": true,
-                "value": "declaration"
+                "type": "SYMBOL",
+                "name": "condition_declaration"
               }
             }
           ]
@@ -5314,7 +5309,7 @@
         },
         {
           "type": "SYMBOL",
-          "name": "lambda_expression"
+          "name": "lambda"
         },
         {
           "type": "SYMBOL",
@@ -9856,7 +9851,7 @@
         }
       ]
     },
-    "throw_statement": {
+    "throw": {
       "type": "SEQ",
       "members": [
         {
@@ -10188,7 +10183,7 @@
         }
       ]
     },
-    "lambda_expression": {
+    "lambda": {
       "type": "SEQ",
       "members": [
         {
@@ -10374,32 +10369,36 @@
       ]
     },
     "destructor_name": {
-      "type": "PREC",
-      "value": 1,
+      "type": "FIELD",
+      "name": "identifier",
       "content": {
-        "type": "SEQ",
-        "members": [
-          {
-            "type": "STRING",
-            "value": "~"
-          },
-          {
-            "type": "SYMBOL",
-            "name": "identifier"
-          }
-        ]
+        "type": "PREC",
+        "value": 1,
+        "content": {
+          "type": "SEQ",
+          "members": [
+            {
+              "type": "STRING",
+              "value": "~"
+            },
+            {
+              "type": "SYMBOL",
+              "name": "identifier"
+            }
+          ]
+        }
       }
     },
     "scoped_field_identifier": {
-      "type": "PREC",
-      "value": 1,
+      "type": "FIELD",
+      "name": "identifier",
       "content": {
-        "type": "SEQ",
-        "members": [
-          {
-            "type": "FIELD",
-            "name": "namespace",
-            "content": {
+        "type": "PREC",
+        "value": 1,
+        "content": {
+          "type": "SEQ",
+          "members": [
+            {
               "type": "CHOICE",
               "members": [
                 {
@@ -10423,16 +10422,12 @@
                   "type": "BLANK"
                 }
               ]
-            }
-          },
-          {
-            "type": "STRING",
-            "value": "::"
-          },
-          {
-            "type": "FIELD",
-            "name": "name",
-            "content": {
+            },
+            {
+              "type": "STRING",
+              "value": "::"
+            },
+            {
               "type": "CHOICE",
               "members": [
                 {
@@ -10449,20 +10444,20 @@
                 }
               ]
             }
-          }
-        ]
+          ]
+        }
       }
     },
     "scoped_identifier": {
-      "type": "PREC",
-      "value": 1,
+      "type": "FIELD",
+      "name": "identifier",
       "content": {
-        "type": "SEQ",
-        "members": [
-          {
-            "type": "FIELD",
-            "name": "namespace",
-            "content": {
+        "type": "PREC",
+        "value": 1,
+        "content": {
+          "type": "SEQ",
+          "members": [
+            {
               "type": "CHOICE",
               "members": [
                 {
@@ -10486,16 +10481,12 @@
                   "type": "BLANK"
                 }
               ]
-            }
-          },
-          {
-            "type": "STRING",
-            "value": "::"
-          },
-          {
-            "type": "FIELD",
-            "name": "name",
-            "content": {
+            },
+            {
+              "type": "STRING",
+              "value": "::"
+            },
+            {
               "type": "CHOICE",
               "members": [
                 {
@@ -10512,20 +10503,20 @@
                 }
               ]
             }
-          }
-        ]
+          ]
+        }
       }
     },
     "scoped_type_identifier": {
-      "type": "PREC",
-      "value": 1,
+      "type": "FIELD",
+      "name": "identifier",
       "content": {
-        "type": "SEQ",
-        "members": [
-          {
-            "type": "FIELD",
-            "name": "namespace",
-            "content": {
+        "type": "PREC",
+        "value": 1,
+        "content": {
+          "type": "SEQ",
+          "members": [
+            {
               "type": "CHOICE",
               "members": [
                 {
@@ -10549,33 +10540,29 @@
                   "type": "BLANK"
                 }
               ]
-            }
-          },
-          {
-            "type": "STRING",
-            "value": "::"
-          },
-          {
-            "type": "FIELD",
-            "name": "name",
-            "content": {
+            },
+            {
+              "type": "STRING",
+              "value": "::"
+            },
+            {
               "type": "SYMBOL",
               "name": "_type_identifier"
             }
-          }
-        ]
+          ]
+        }
       }
     },
     "scoped_namespace_identifier": {
-      "type": "PREC",
-      "value": 2,
+      "type": "FIELD",
+      "name": "identifier",
       "content": {
-        "type": "SEQ",
-        "members": [
-          {
-            "type": "FIELD",
-            "name": "namespace",
-            "content": {
+        "type": "PREC",
+        "value": 2,
+        "content": {
+          "type": "SEQ",
+          "members": [
+            {
               "type": "CHOICE",
               "members": [
                 {
@@ -10599,21 +10586,17 @@
                   "type": "BLANK"
                 }
               ]
-            }
-          },
-          {
-            "type": "STRING",
-            "value": "::"
-          },
-          {
-            "type": "FIELD",
-            "name": "name",
-            "content": {
+            },
+            {
+              "type": "STRING",
+              "value": "::"
+            },
+            {
               "type": "SYMBOL",
               "name": "_namespace_identifier"
             }
-          }
-        ]
+          ]
+        }
       }
     },
     "operator_name": {

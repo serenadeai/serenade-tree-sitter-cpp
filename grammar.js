@@ -63,7 +63,7 @@ module.exports = grammar(C, {
     _type_specifier: $ => choice(
       $.struct_specifier,
       $.union_specifier,
-      $.enum_specifier,
+      $.enum,
       $.class_specifier,
       $.sized_type_specifier,
       $.primitive_type,
@@ -149,7 +149,7 @@ module.exports = grammar(C, {
       optional('...')
     ),
 
-    enum_specifier: $ => prec.left(seq(
+    enum: $ => prec.left(seq(
       'enum',
       optional(choice('class', 'struct')),
       choice(
@@ -610,7 +610,7 @@ module.exports = grammar(C, {
     statement: ($, original) => choice(
       original,
       $.try,
-      $.throw_statement,
+      $.throw,
     ),
 
     // If statement has constexpr which is new. 
@@ -635,7 +635,7 @@ module.exports = grammar(C, {
             $.comma_expression
           )),
         ),
-        field('value', alias($.condition_declaration, $.declaration))
+        field('value', $.condition_declaration)
       ),
     ),
 
@@ -674,7 +674,7 @@ module.exports = grammar(C, {
       $.initializer_list
     ),
 
-    throw_statement: $ => seq(
+    throw: $ => seq(
       'throw',
       optional($._expression),
       ';'
@@ -690,12 +690,6 @@ module.exports = grammar(C, {
       'try', 
       $.enclosed_body
     ), 
-
-    // try: $ => seq(
-    //   'try',
-    //   field('body', $.enclosed_body),
-    //   repeat1($.catch)
-    // ),
 
     catch_parameter_block: $ => seq(
       '(',
@@ -723,7 +717,7 @@ module.exports = grammar(C, {
       $.scoped_identifier,
       $.new_expression,
       $.delete_expression,
-      $.lambda_expression,
+      $.lambda,
       $.parameter_pack_expansion,
       $.nullptr,
       $.this,
@@ -775,7 +769,7 @@ module.exports = grammar(C, {
       )
     ),
 
-    lambda_expression: $ => seq(
+    lambda: $ => seq(
       field('captures', $.lambda_capture_specifier),
       optional(field('declarator', $.abstract_function_declarator)),
       field('body', $.enclosed_body)
@@ -818,7 +812,7 @@ module.exports = grammar(C, {
 
     argument: ($, original) => choice(original, $.initializer_list),
 
-    destructor_name: $ => prec(1, seq('~', $.identifier)),
+    destructor_name: $ => field('identifier', prec(1, seq('~', $.identifier))),
 
     compound_literal_expression: ($, original) => choice(
       original,
@@ -832,53 +826,53 @@ module.exports = grammar(C, {
       )
     ),
 
-    scoped_field_identifier: $ => prec(1, seq(
-      field('namespace', optional(choice(
+    scoped_field_identifier: $ => field('identifier', prec(1, seq(
+      optional(choice(
         $._namespace_identifier,
         $.template_type,
         $.scoped_namespace_identifier
-      ))),
+      )),
       '::',
-      field('name', choice(
+      choice(
         $._field_identifier,
         $.operator_name,
         $.destructor_name
-      ))
-    )),
+      )
+    ))),
 
-    scoped_identifier: $ => prec(1, seq(
-      field('namespace', optional(choice(
+    scoped_identifier: $ => field('identifier', prec(1, seq(
+      optional(choice(
         $._namespace_identifier,
         $.template_type,
         $.scoped_namespace_identifier
-      ))),
+      )),
       '::',
-      field('name', choice(
+      choice(
         $.identifier,
         $.operator_name,
         $.destructor_name
-      ))
-    )),
+      )
+    ))),
 
-    scoped_type_identifier: $ => prec(1, seq(
-      field('namespace', optional(choice(
+    scoped_type_identifier: $ => field('identifier', prec(1, seq(
+      optional(choice(
         $._namespace_identifier,
         $.template_type,
         $.scoped_namespace_identifier
-      ))),
+      )),
       '::',
-      field('name', $._type_identifier)
-    )),
+      $._type_identifier
+    ))),
 
-    scoped_namespace_identifier: $ => prec(2, seq(
-      field('namespace', optional(choice(
+    scoped_namespace_identifier: $ => field('identifier', prec(2, seq(
+      optional(choice(
         $._namespace_identifier,
         $.template_type,
         $.scoped_namespace_identifier
-      ))),
+      )),
       '::',
-      field('name', $._namespace_identifier)
-    )),
+      $._namespace_identifier
+    ))),
 
     _assignment_left_expression: ($, original) => choice(
       original,
