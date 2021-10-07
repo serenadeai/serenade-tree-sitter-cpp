@@ -24,10 +24,10 @@ module.exports = grammar(C, {
     [$._expression, $._declarator],
     [$._expression, $.structured_binding_declarator],
     [$._expression, $._declarator, $._type_specifier],
-    [$.parameter_list, $.argument_list],
+    [$.parameter_list_block, $.argument_list],
     [$._type_specifier, $.call_expression],
-    [$._declaration_specifiers, $.operator_cast_declaration, $.operator_cast_definition, $.constructor_or_destructor_definition],
-    [$._declaration_specifiers, $._constructor_specifiers],
+    [$.declaration_specifiers, $.operator_cast_declaration, $.operator_cast_definition, $.constructor_or_destructor_definition],
+    [$.declaration_specifiers, $._constructor_specifiers],
   ]),
 
   inline: ($, original) => original.concat([
@@ -35,7 +35,7 @@ module.exports = grammar(C, {
   ]),
 
   rules: {
-    _top_level_item: ($, original) => choice(
+    top_level_item: ($, original) => choice(
       original,
       $.namespace_definition,
       $.using_declaration,
@@ -196,7 +196,7 @@ module.exports = grammar(C, {
       original
     ),
 
-    declaration: ($, original) => seq(
+    declaration_without_semicolon: ($, original) => seq(
       repeat($.attribute),
       original
     ),
@@ -205,7 +205,7 @@ module.exports = grammar(C, {
       'template',
       field('parameters', $.template_parameter_list),
       choice(
-        $._empty_declaration,
+        $.empty_declaration,
         $.alias_declaration,
         $.declaration,
         $.template_declaration,
@@ -219,7 +219,7 @@ module.exports = grammar(C, {
 
     template_instantiation: $ => seq(
       'template',
-      optional($._declaration_specifiers),
+      optional($.declaration_specifiers),
       field('declarator', $._declarator),
       ';'
     ),
@@ -271,26 +271,24 @@ module.exports = grammar(C, {
       )
     ),
 
-    parameter_list: $ => seq(
-      '(',
-      commaSep(choice(
+    parameter_list: $ => commaSep1(
+      field('parameter', choice(
         $.parameter_declaration,
         $.optional_parameter_declaration,
         $.variadic_parameter_declaration,
         '...'
-      )),
-      ')'
+      ))
     ),
 
     optional_parameter_declaration: $ => seq(
-      $._declaration_specifiers,
+      $.declaration_specifiers,
       field('declarator', optional($._declarator)),
       '=',
       field('default_value', $._expression)
     ),
 
     variadic_parameter_declaration: $ => seq(
-      $._declaration_specifiers,
+      $.declaration_specifiers,
       field('declarator', choice(
         $.variadic_declarator,
         alias($.variadic_reference_declarator, $.reference_declarator)
@@ -328,7 +326,7 @@ module.exports = grammar(C, {
         '::',
       )),
       'operator',
-      $._declaration_specifiers,
+      $.declaration_specifiers,
       field('declarator', $._abstract_declarator),
     )),
 
@@ -366,7 +364,7 @@ module.exports = grammar(C, {
     field_declaration: $ => seq(
       repeat($.attribute),
       optional($.virtual_function_specifier),
-      $._declaration_specifiers,
+      $.declaration_specifiers,
       commaSep(field('declarator', $._field_declarator)),
       optional(choice(
         $.bitfield_clause,
@@ -379,7 +377,7 @@ module.exports = grammar(C, {
     inline_method_definition: $ => seq(
       repeat($.attribute),
       optional($.virtual_function_specifier),
-      $._declaration_specifiers,
+      $.declaration_specifiers,
       field('declarator', $._field_declarator),
       choice(
         field('body', $.compound_statement),
@@ -616,38 +614,24 @@ module.exports = grammar(C, {
 
     // Statements
 
-    _statement: ($, original) => choice(
+    statement: ($, original) => choice(
       original,
       $.for_range_loop,
       $.try_statement,
       $.throw_statement,
     ),
 
-    switch_statement: $ => seq(
-      'switch',
-      field('condition', $.condition_clause),
-      field('body', $.compound_statement)
+    // If statement has constexpr which is new. 
+
+    if_clause: $ => prec.dynamic(0, 
+      seq('if', optional('constexpr'), '(', $.condition, ')', $.statement),
     ),
 
-    while_statement: $ => seq(
-      'while',
-      field('condition', $.condition_clause),
-      field('body', $._statement)
-    ),
+    else_if_clause: $ => prec.dynamic(1, seq(
+      'else', 'if', optional('constexpr'), '(', $.condition, ')', $.statement
+    )), 
 
-    if_statement: $ => prec.right(seq(
-      'if',
-      optional('constexpr'),
-      field('condition', $.condition_clause),
-      field('consequence', $._statement),
-      optional(seq(
-        'else',
-        field('alternative', $._statement)
-      ))
-    )),
-
-    condition_clause: $ => seq(
-      '(',
+    condition: $ => seq(
       choice(
         seq(
           field('initializer', optional(choice(
@@ -661,11 +645,10 @@ module.exports = grammar(C, {
         ),
         field('value', alias($.condition_declaration, $.declaration))
       ),
-      ')',
     ),
 
     condition_declaration: $ => seq(
-      $._declaration_specifiers,
+      $.declaration_specifiers,
       field('declarator', $._declarator),
       choice(
         seq(
@@ -679,7 +662,7 @@ module.exports = grammar(C, {
     for_range_loop: $ => seq(
       'for',
       '(',
-      $._declaration_specifiers,
+      $.declaration_specifiers,
       field('declarator', $._declarator),
       ':',
       field('right', choice(
@@ -687,7 +670,7 @@ module.exports = grammar(C, {
         $.initializer_list,
       )),
       ')',
-      field('body', $._statement)
+      field('body', $.statement)
     ),
 
     return_statement: ($, original) => choice(
@@ -709,7 +692,7 @@ module.exports = grammar(C, {
 
     catch_clause: $ => seq(
       'catch',
-      field('parameters', $.parameter_list),
+      field('parameters', $.parameter_list_block),
       field('body', $.compound_statement)
     ),
 
@@ -929,4 +912,8 @@ function commaSep(rule) {
 
 function commaSep1(rule) {
   return seq(rule, repeat(seq(',', rule)));
+}
+
+function optional_with_placeholder(field_name, rule) {
+  return choice(field(field_name, rule), field(field_name, blank()));
 }
