@@ -24,7 +24,7 @@ module.exports = grammar(C, {
     [$._expression, $._declarator],
     [$._expression, $.structured_binding_declarator],
     [$._expression, $._declarator, $._type_specifier],
-    [$.parameter_list_block, $.argument_list],
+    [$.parameter_list_block, $.argument_list_block],
     [$._type_specifier, $.call_expression],
     [$.declaration_specifier, $.operator_cast_declaration, $.operator_cast_definition, $.constructor_or_destructor_definition],
     [$.declaration_specifier, $._constructor_specifiers],
@@ -166,9 +166,9 @@ module.exports = grammar(C, {
         seq(
           field('name', $._class_name),
           optional($._enum_base_clause),
-          optional(field('body', $.enumerator_list))
+          optional(field('body', $.enumerator_list_block))
         ),
-        field('body', $.enumerator_list)
+        field('body', $.enumerator_list_block)
       )
     )),
 
@@ -313,7 +313,7 @@ module.exports = grammar(C, {
       seq(
         field('declarator', $._declarator),
         field('value', choice(
-          $.argument_list,
+          $.argument_list_block,
           $.initializer_list
         ))
       )
@@ -335,7 +335,7 @@ module.exports = grammar(C, {
 
     // Avoid ambiguity between compound statement and initializer list in a construct like:
     //   A b {};
-    compound_statement: ($, original) => prec(-1, original),
+    enclosed_body: ($, original) => prec(-1, original),
 
     field_initializer_list: $ => seq(
       ':',
@@ -344,7 +344,7 @@ module.exports = grammar(C, {
 
     field_initializer: $ => prec(1, seq(
       choice($._field_identifier, $.scoped_field_identifier),
-      choice($.initializer_list, $.argument_list),
+      choice($.initializer_list, $.argument_list_block),
       optional('...')
     )),
 
@@ -383,7 +383,7 @@ module.exports = grammar(C, {
       $.declaration_specifiers,
       field('declarator', $._field_declarator),
       choice(
-        field('body', $.compound_statement),
+        field('body', $.enclosed_body),
         $.default_method_clause,
         $.delete_method_clause
       )
@@ -403,7 +403,7 @@ module.exports = grammar(C, {
       optional($._constructor_specifiers),
       field('declarator', $.operator_cast),
       choice(
-        field('body', $.compound_statement),
+        field('body', $.enclosed_body),
         $.default_method_clause,
         $.delete_method_clause
       )
@@ -421,7 +421,7 @@ module.exports = grammar(C, {
       field('declarator', $.function_declarator),
       optional($.field_initializer_list),
       choice(
-        field('body', $.compound_statement),
+        field('body', $.enclosed_body),
         $.default_method_clause,
         $.delete_method_clause
       )
@@ -689,14 +689,14 @@ module.exports = grammar(C, {
 
     try_statement: $ => seq(
       'try',
-      field('body', $.compound_statement),
+      field('body', $.enclosed_body),
       repeat1($.catch_clause)
     ),
 
     catch_clause: $ => seq(
       'catch',
       field('parameters', $.parameter_list_block),
-      field('body', $.compound_statement)
+      field('body', $.enclosed_body)
     ),
 
     attribute: $ => seq(
@@ -722,17 +722,17 @@ module.exports = grammar(C, {
 
     call_expression: ($, original) => choice(original, seq(
       field('function', $.primitive_type),
-      field('arguments', $.argument_list)
+      field('arguments', $.argument_list_block)
     )),
 
     new_expression: $ => prec.right(PREC.NEW, seq(
       optional('::'),
       'new',
-      field('placement', optional($.argument_list)),
+      field('placement', optional($.argument_list_block)),
       field('type', $._type_specifier),
       field('declarator', optional($.new_declarator)),
       field('arguments', optional(choice(
-        $.argument_list,
+        $.argument_list_block,
         $.initializer_list
       )))
     )),
@@ -768,7 +768,7 @@ module.exports = grammar(C, {
     lambda_expression: $ => seq(
       field('captures', $.lambda_capture_specifier),
       optional(field('declarator', $.abstract_function_declarator)),
-      field('body', $.compound_statement)
+      field('body', $.enclosed_body)
     ),
 
     lambda_capture_specifier: $ => prec(PREC.LAMBDA, seq(
@@ -806,11 +806,7 @@ module.exports = grammar(C, {
       ),
     ),
 
-    argument_list: $ => seq(
-      '(',
-      commaSep(choice($._expression, $.initializer_list)),
-      ')'
-    ),
+    argument_list: $ => commaSep1(choice($._expression, $.initializer_list)),
 
     destructor_name: $ => prec(1, seq('~', $.identifier)),
 
