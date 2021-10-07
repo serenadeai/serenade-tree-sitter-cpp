@@ -376,7 +376,7 @@
         "named": true
       },
       {
-        "type": "try_statement",
+        "type": "try",
         "named": true
       },
       {
@@ -561,11 +561,11 @@
     }
   },
   {
-    "type": "argument_list",
+    "type": "argument",
     "named": true,
     "fields": {},
     "children": {
-      "multiple": true,
+      "multiple": false,
       "required": true,
       "types": [
         {
@@ -574,6 +574,21 @@
         },
         {
           "type": "initializer_list",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "argument_list",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": true,
+      "types": [
+        {
+          "type": "argument",
           "named": true
         }
       ]
@@ -827,24 +842,21 @@
   {
     "type": "base_class_clause",
     "named": true,
-    "fields": {},
-    "children": {
-      "multiple": true,
-      "required": true,
-      "types": [
-        {
-          "type": "identifier",
-          "named": true
-        },
-        {
-          "type": "scoped_type_identifier",
-          "named": true
-        },
-        {
-          "type": "template_type",
-          "named": true
-        }
-      ]
+    "fields": {
+      "extends_list": {
+        "multiple": true,
+        "required": true,
+        "types": [
+          {
+            "type": ",",
+            "named": false
+          },
+          {
+            "type": "extends_type",
+            "named": true
+          }
+        ]
+      }
     }
   },
   {
@@ -1166,29 +1178,72 @@
     }
   },
   {
-    "type": "catch_clause",
+    "type": "catch",
     "named": true,
     "fields": {
-      "body": {
+      "catch_parameter_optional": {
         "multiple": false,
         "required": true,
         "types": [
           {
-            "type": "enclosed_body",
-            "named": true
-          }
-        ]
-      },
-      "parameters": {
-        "multiple": false,
-        "required": true,
-        "types": [
-          {
-            "type": "parameter_list_block",
+            "type": "catch_parameter_block",
             "named": true
           }
         ]
       }
+    },
+    "children": {
+      "multiple": false,
+      "required": true,
+      "types": [
+        {
+          "type": "enclosed_body",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "catch_parameter",
+    "named": true,
+    "fields": {
+      "parameter": {
+        "multiple": true,
+        "required": true,
+        "types": [
+          {
+            "type": "...",
+            "named": false
+          },
+          {
+            "type": "optional_parameter_declaration",
+            "named": true
+          },
+          {
+            "type": "parameter_declaration",
+            "named": true
+          },
+          {
+            "type": "variadic_parameter_declaration",
+            "named": true
+          }
+        ]
+      }
+    }
+  },
+  {
+    "type": "catch_parameter_block",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": false,
+      "required": true,
+      "types": [
+        {
+          "type": "catch_parameter",
+          "named": true
+        }
+      ]
     }
   },
   {
@@ -1914,6 +1969,29 @@
         },
         {
           "type": "comma_expression",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "extends_type",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": false,
+      "required": true,
+      "types": [
+        {
+          "type": "identifier",
+          "named": true
+        },
+        {
+          "type": "scoped_type_identifier",
+          "named": true
+        },
+        {
+          "type": "template_type",
           "named": true
         }
       ]
@@ -4698,26 +4776,51 @@
     }
   },
   {
-    "type": "try_statement",
+    "type": "try",
     "named": true,
     "fields": {
-      "body": {
-        "multiple": false,
+      "catch_list": {
+        "multiple": true,
         "required": true,
         "types": [
           {
-            "type": "enclosed_body",
+            "type": "catch",
             "named": true
+          }
+        ]
+      },
+      "finally_clause_optional": {
+        "multiple": false,
+        "required": false,
+        "types": [
+          {
+            "type": "!!UNMATCHABLE_4b0fd36954db",
+            "named": false
           }
         ]
       }
     },
     "children": {
-      "multiple": true,
+      "multiple": false,
       "required": true,
       "types": [
         {
-          "type": "catch_clause",
+          "type": "try_clause",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "try_clause",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": false,
+      "required": true,
+      "types": [
+        {
+          "type": "enclosed_body",
           "named": true
         }
       ]
@@ -5044,12 +5147,38 @@
   {
     "type": "virtual_function_specifier",
     "named": true,
-    "fields": {}
+    "fields": {
+      "modifier": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "virtual",
+            "named": false
+          }
+        ]
+      }
+    }
   },
   {
     "type": "virtual_specifier",
     "named": true,
-    "fields": {}
+    "fields": {
+      "modifier": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "final",
+            "named": false
+          },
+          {
+            "type": "override",
+            "named": false
+          }
+        ]
+      }
+    }
   },
   {
     "type": "while_statement",
@@ -5083,6 +5212,10 @@
   },
   {
     "type": "!",
+    "named": false
+  },
+  {
+    "type": "!!UNMATCHABLE_4b0fd36954db",
     "named": false
   },
   {

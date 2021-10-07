@@ -28,6 +28,9 @@ module.exports = grammar(C, {
     [$._type_specifier, $.call_expression],
     [$.declaration_specifier, $.operator_cast_declaration, $.operator_cast_definition, $.constructor_or_destructor_definition],
     [$.declaration_specifier, $.constructor_specifiers],
+
+    [$.extends_type], 
+    [$.base_class_clause], 
   ]),
 
   inline: ($, original) => original.concat([
@@ -86,43 +89,28 @@ module.exports = grammar(C, {
     class_specifier: $ => prec.right(seq(
       'class',
       optional($.ms_declspec_modifier),
-      choice(
-        field('name', $._class_name),
-        seq(
-          optional(field('name', $._class_name)),
-          optional($.virtual_specifier),
-          optional($.base_class_clause),
-          field('body', $.field_declaration_list)
-        )
-      )
+      optional(field('name', $._class_name)), 
+      optional($.virtual_specifier),
+      optional($.base_class_clause),
+      optional(field('body', $.field_declaration_list))
     )),
 
     union_specifier: $ => prec.right(seq(
       'union',
       optional($.ms_declspec_modifier),
-      choice(
-        field('name', $._class_name),
-        seq(
-          optional(field('name', $._class_name)),
-          optional($.virtual_specifier),
-          optional($.base_class_clause),
-          field('body', $.field_declaration_list)
-        )
-      )
+      optional(field('name', $._class_name)), 
+      optional($.virtual_specifier),
+      optional($.base_class_clause),
+      optional(field('body', $.field_declaration_list)) 
     )),
 
     struct_specifier: $ => prec.right(seq(
       'struct',
       optional($.ms_declspec_modifier),
-      choice(
-        field('name', $._class_name),
-        seq(
-          optional(field('name', $._class_name)),
-          optional($.virtual_specifier),
-          optional($.base_class_clause),
-          field('body', $.field_declaration_list)
-        )
-      )
+      optional(field('name', $._class_name)), 
+      optional($.virtual_specifier),
+      optional($.base_class_clause),
+      optional(field('body', $.field_declaration_list))
     )),
 
     _class_name: $ => prec.right(choice(
@@ -131,14 +119,14 @@ module.exports = grammar(C, {
       $.template_type
     )),
 
-    virtual_specifier: $ => choice(
+    virtual_specifier: $ => field('modifier', choice(
       'final', // the only legal value here for classes
       'override' // legal for functions in addition to final, plus permutations.
-    ),
+    )),
 
-    virtual_function_specifier: $ => choice(
+    virtual_function_specifier: $ => field('modifier', choice(
       'virtual'
-    ),
+    )),
 
     explicit_function_specifier: $ => choice(
       'explicit',
@@ -152,11 +140,13 @@ module.exports = grammar(C, {
 
     base_class_clause: $ => seq(
       ':',
-      commaSep1(seq(
-        optional(choice('public', 'private', 'protected')),
-        $._class_name,
-        optional('...')
-      ))
+      field('extends_list', commaSep1($.extends_type))
+    ),
+
+    extends_type: $ => seq(
+      optional(choice('public', 'private', 'protected')),
+      $._class_name,
+      optional('...')
     ),
 
     enum_specifier: $ => prec.left(seq(
@@ -619,7 +609,7 @@ module.exports = grammar(C, {
 
     statement: ($, original) => choice(
       original,
-      $.try_statement,
+      $.try,
       $.throw_statement,
     ),
 
@@ -689,17 +679,34 @@ module.exports = grammar(C, {
       optional($._expression),
       ';'
     ),
-
-    try_statement: $ => seq(
-      'try',
-      field('body', $.enclosed_body),
-      repeat1($.catch_clause)
+    
+    try: $ => seq(
+      $.try_clause,
+      field('catch_list', repeat1($.catch)), 
+      optional_with_placeholder("finally_clause_optional", "!!UNMATCHABLE_4b0fd36954db") // Here for Spec purposes. 
     ),
 
-    catch_clause: $ => seq(
+    try_clause: $ => seq(
+      'try', 
+      $.enclosed_body
+    ), 
+
+    // try: $ => seq(
+    //   'try',
+    //   field('body', $.enclosed_body),
+    //   repeat1($.catch)
+    // ),
+
+    catch_parameter_block: $ => seq(
+      '(',
+      alias($.parameter_list, $.catch_parameter),
+      ')'
+    ),
+
+    catch: $ => seq(
       'catch',
-      field('parameters', $.parameter_list_block),
-      field('body', $.enclosed_body)
+      field('catch_parameter_optional', $.catch_parameter_block),
+      $.enclosed_body
     ),
 
     attribute: $ => seq(
@@ -809,7 +816,7 @@ module.exports = grammar(C, {
       ),
     ),
 
-    argument_list: $ => commaSep1(choice($._expression, $.initializer_list)),
+    argument: ($, original) => choice(original, $.initializer_list),
 
     destructor_name: $ => prec(1, seq('~', $.identifier)),
 
