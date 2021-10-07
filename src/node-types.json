@@ -1248,12 +1248,32 @@
     "type": "class_specifier",
     "named": true,
     "fields": {
-      "body": {
+      "enclosed_body": {
         "multiple": false,
         "required": false,
         "types": [
           {
             "type": "field_declaration_list",
+            "named": true
+          }
+        ]
+      },
+      "extends_list_optional": {
+        "multiple": false,
+        "required": false,
+        "types": [
+          {
+            "type": "base_class_clause",
+            "named": true
+          }
+        ]
+      },
+      "modifier_list": {
+        "multiple": false,
+        "required": false,
+        "types": [
+          {
+            "type": "virtual_specifier",
             "named": true
           }
         ]
@@ -1278,19 +1298,11 @@
       }
     },
     "children": {
-      "multiple": true,
+      "multiple": false,
       "required": false,
       "types": [
         {
-          "type": "base_class_clause",
-          "named": true
-        },
-        {
           "type": "ms_declspec_modifier",
-          "named": true
-        },
-        {
-          "type": "virtual_specifier",
           "named": true
         }
       ]
@@ -1656,45 +1668,10 @@
   {
     "type": "declaration",
     "named": true,
-    "fields": {
-      "declarator": {
-        "multiple": false,
-        "required": false,
-        "types": [
-          {
-            "type": "function_declarator",
-            "named": true
-          },
-          {
-            "type": "operator_cast",
-            "named": true
-          }
-        ]
-      },
-      "default_value": {
-        "multiple": false,
-        "required": false,
-        "types": [
-          {
-            "type": "_expression",
-            "named": true
-          }
-        ]
-      },
-      "modifier_list": {
-        "multiple": false,
-        "required": false,
-        "types": [
-          {
-            "type": "constructor_specifiers",
-            "named": true
-          }
-        ]
-      }
-    },
+    "fields": {},
     "children": {
       "multiple": false,
-      "required": false,
+      "required": true,
       "types": [
         {
           "type": "declaration_without_semicolon",
@@ -2166,7 +2143,7 @@
           }
         ]
       },
-      "body": {
+      "enclosed_body": {
         "multiple": false,
         "required": false,
         "types": [
@@ -2408,11 +2385,11 @@
             "named": true
           },
           {
-            "type": "preproc_if",
+            "type": "preproc_if_in_field_declaration_list",
             "named": true
           },
           {
-            "type": "preproc_ifdef",
+            "type": "preproc_ifdef_in_field_declaration_list",
             "named": true
           },
           {
@@ -2877,7 +2854,7 @@
     "fields": {
       "body": {
         "multiple": false,
-        "required": false,
+        "required": true,
         "types": [
           {
             "type": "enclosed_body",
@@ -2903,10 +2880,6 @@
           },
           {
             "type": "identifier",
-            "named": true
-          },
-          {
-            "type": "operator_cast",
             "named": true
           },
           {
@@ -2938,21 +2911,11 @@
             "named": true
           }
         ]
-      },
-      "modifier_list": {
-        "multiple": false,
-        "required": false,
-        "types": [
-          {
-            "type": "constructor_specifiers",
-            "named": true
-          }
-        ]
       }
     },
     "children": {
       "multiple": true,
-      "required": false,
+      "required": true,
       "types": [
         {
           "type": "attribute",
@@ -2960,18 +2923,6 @@
         },
         {
           "type": "declaration_specifiers",
-          "named": true
-        },
-        {
-          "type": "default_method_clause",
-          "named": true
-        },
-        {
-          "type": "delete_method_clause",
-          "named": true
-        },
-        {
-          "type": "field_initializer_list",
           "named": true
         },
         {
@@ -3219,10 +3170,40 @@
             "named": true
           }
         ]
-      },
-      "declarator": {
+      }
+    },
+    "children": {
+      "multiple": false,
+      "required": false,
+      "types": [
+        {
+          "type": "init_list_declarator",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "init_list_declarator",
+    "named": true,
+    "fields": {
+      "assignment_value": {
         "multiple": false,
-        "required": false,
+        "required": true,
+        "types": [
+          {
+            "type": "argument_list_block",
+            "named": true
+          },
+          {
+            "type": "initializer_list",
+            "named": true
+          }
+        ]
+      },
+      "assignment_variable": {
+        "multiple": false,
+        "required": true,
         "types": [
           {
             "type": "array_declarator",
@@ -3266,20 +3247,6 @@
           },
           {
             "type": "template_function",
-            "named": true
-          }
-        ]
-      },
-      "value": {
-        "multiple": false,
-        "required": false,
-        "types": [
-          {
-            "type": "argument_list_block",
-            "named": true
-          },
-          {
-            "type": "initializer_list",
             "named": true
           }
         ]
@@ -3599,7 +3566,7 @@
     "type": "namespace",
     "named": true,
     "fields": {
-      "body": {
+      "enclosed_body": {
         "multiple": false,
         "required": true,
         "types": [
@@ -4726,11 +4693,11 @@
           "named": true
         },
         {
-          "type": "preproc_if",
+          "type": "preproc_if_in_field_declaration_list",
           "named": true
         },
         {
-          "type": "preproc_ifdef",
+          "type": "preproc_ifdef_in_field_declaration_list",
           "named": true
         },
         {
@@ -4813,11 +4780,11 @@
           "named": true
         },
         {
-          "type": "preproc_if",
+          "type": "preproc_if_in_field_declaration_list",
           "named": true
         },
         {
-          "type": "preproc_ifdef",
+          "type": "preproc_ifdef_in_field_declaration_list",
           "named": true
         },
         {
@@ -4941,6 +4908,74 @@
       "required": false,
       "types": [
         {
+          "type": "top_level_item",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "preproc_if_in_field_declaration_list",
+    "named": true,
+    "fields": {
+      "alternative": {
+        "multiple": false,
+        "required": false,
+        "types": [
+          {
+            "type": "preproc_elif",
+            "named": true
+          },
+          {
+            "type": "preproc_else",
+            "named": true
+          }
+        ]
+      },
+      "condition": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "binary_expression",
+            "named": true
+          },
+          {
+            "type": "call",
+            "named": true
+          },
+          {
+            "type": "char_literal",
+            "named": true
+          },
+          {
+            "type": "identifier",
+            "named": true
+          },
+          {
+            "type": "number_literal",
+            "named": true
+          },
+          {
+            "type": "parenthesized_expression",
+            "named": true
+          },
+          {
+            "type": "preproc_defined",
+            "named": true
+          },
+          {
+            "type": "unary_expression",
+            "named": true
+          }
+        ]
+      }
+    },
+    "children": {
+      "multiple": true,
+      "required": false,
+      "types": [
+        {
           "type": "access_specifier",
           "named": true
         },
@@ -4989,11 +5024,11 @@
           "named": true
         },
         {
-          "type": "preproc_if",
+          "type": "preproc_if_in_field_declaration_list",
           "named": true
         },
         {
-          "type": "preproc_ifdef",
+          "type": "preproc_ifdef_in_field_declaration_list",
           "named": true
         },
         {
@@ -5002,10 +5037,6 @@
         },
         {
           "type": "template_declaration",
-          "named": true
-        },
-        {
-          "type": "top_level_item",
           "named": true
         },
         {
@@ -5021,6 +5052,46 @@
   },
   {
     "type": "preproc_ifdef",
+    "named": true,
+    "fields": {
+      "alternative": {
+        "multiple": false,
+        "required": false,
+        "types": [
+          {
+            "type": "preproc_elif",
+            "named": true
+          },
+          {
+            "type": "preproc_else",
+            "named": true
+          }
+        ]
+      },
+      "name": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "identifier",
+            "named": true
+          }
+        ]
+      }
+    },
+    "children": {
+      "multiple": true,
+      "required": false,
+      "types": [
+        {
+          "type": "top_level_item",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "preproc_ifdef_in_field_declaration_list",
     "named": true,
     "fields": {
       "alternative": {
@@ -5101,11 +5172,11 @@
           "named": true
         },
         {
-          "type": "preproc_if",
+          "type": "preproc_if_in_field_declaration_list",
           "named": true
         },
         {
-          "type": "preproc_ifdef",
+          "type": "preproc_ifdef_in_field_declaration_list",
           "named": true
         },
         {
@@ -5114,10 +5185,6 @@
         },
         {
           "type": "template_declaration",
-          "named": true
-        },
-        {
-          "type": "top_level_item",
           "named": true
         },
         {
@@ -5651,12 +5718,32 @@
     "type": "struct_specifier",
     "named": true,
     "fields": {
-      "body": {
+      "enclosed_body": {
         "multiple": false,
         "required": false,
         "types": [
           {
             "type": "field_declaration_list",
+            "named": true
+          }
+        ]
+      },
+      "extends_list_optional": {
+        "multiple": false,
+        "required": false,
+        "types": [
+          {
+            "type": "base_class_clause",
+            "named": true
+          }
+        ]
+      },
+      "modifier_list": {
+        "multiple": false,
+        "required": false,
+        "types": [
+          {
+            "type": "virtual_specifier",
             "named": true
           }
         ]
@@ -5681,19 +5768,11 @@
       }
     },
     "children": {
-      "multiple": true,
+      "multiple": false,
       "required": false,
       "types": [
         {
-          "type": "base_class_clause",
-          "named": true
-        },
-        {
           "type": "ms_declspec_modifier",
-          "named": true
-        },
-        {
-          "type": "virtual_specifier",
           "named": true
         }
       ]
@@ -5824,6 +5903,14 @@
           "named": true
         },
         {
+          "type": "constructor_or_destructor_declaration",
+          "named": true
+        },
+        {
+          "type": "constructor_or_destructor_definition",
+          "named": true
+        },
+        {
           "type": "declaration",
           "named": true
         },
@@ -5833,6 +5920,14 @@
         },
         {
           "type": "function_definition",
+          "named": true
+        },
+        {
+          "type": "operator_cast_declaration",
+          "named": true
+        },
+        {
+          "type": "operator_cast_definition",
           "named": true
         },
         {
@@ -6104,84 +6199,97 @@
   {
     "type": "top_level_item",
     "named": true,
-    "fields": {},
-    "children": {
-      "multiple": false,
-      "required": true,
-      "types": [
-        {
-          "type": "alias_declaration",
-          "named": true
-        },
-        {
-          "type": "declaration",
-          "named": true
-        },
-        {
-          "type": "empty_declaration",
-          "named": true
-        },
-        {
-          "type": "function_definition",
-          "named": true
-        },
-        {
-          "type": "linkage_specification",
-          "named": true
-        },
-        {
-          "type": "namespace",
-          "named": true
-        },
-        {
-          "type": "preproc_call",
-          "named": true
-        },
-        {
-          "type": "preproc_def",
-          "named": true
-        },
-        {
-          "type": "preproc_function_def",
-          "named": true
-        },
-        {
-          "type": "preproc_if",
-          "named": true
-        },
-        {
-          "type": "preproc_ifdef",
-          "named": true
-        },
-        {
-          "type": "preproc_include",
-          "named": true
-        },
-        {
-          "type": "statement",
-          "named": true
-        },
-        {
-          "type": "static_assert_declaration",
-          "named": true
-        },
-        {
-          "type": "template_declaration",
-          "named": true
-        },
-        {
-          "type": "template_instantiation",
-          "named": true
-        },
-        {
-          "type": "type_definition",
-          "named": true
-        },
-        {
-          "type": "using_declaration",
-          "named": true
-        }
-      ]
+    "fields": {
+      "statement": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "alias_declaration",
+            "named": true
+          },
+          {
+            "type": "constructor_or_destructor_definition",
+            "named": true
+          },
+          {
+            "type": "declaration",
+            "named": true
+          },
+          {
+            "type": "empty_declaration",
+            "named": true
+          },
+          {
+            "type": "function_definition",
+            "named": true
+          },
+          {
+            "type": "linkage_specification",
+            "named": true
+          },
+          {
+            "type": "namespace",
+            "named": true
+          },
+          {
+            "type": "operator_cast_declaration",
+            "named": true
+          },
+          {
+            "type": "operator_cast_definition",
+            "named": true
+          },
+          {
+            "type": "preproc_call",
+            "named": true
+          },
+          {
+            "type": "preproc_def",
+            "named": true
+          },
+          {
+            "type": "preproc_function_def",
+            "named": true
+          },
+          {
+            "type": "preproc_if",
+            "named": true
+          },
+          {
+            "type": "preproc_ifdef",
+            "named": true
+          },
+          {
+            "type": "preproc_include",
+            "named": true
+          },
+          {
+            "type": "statement",
+            "named": true
+          },
+          {
+            "type": "static_assert_declaration",
+            "named": true
+          },
+          {
+            "type": "template_declaration",
+            "named": true
+          },
+          {
+            "type": "template_instantiation",
+            "named": true
+          },
+          {
+            "type": "type_definition",
+            "named": true
+          },
+          {
+            "type": "using_declaration",
+            "named": true
+          }
+        ]
+      }
     }
   },
   {
@@ -6531,7 +6639,7 @@
     "fields": {
       "modifier": {
         "multiple": false,
-        "required": false,
+        "required": true,
         "types": [
           {
             "type": "_Atomic",
@@ -6539,6 +6647,14 @@
           },
           {
             "type": "const",
+            "named": false
+          },
+          {
+            "type": "constexpr",
+            "named": false
+          },
+          {
+            "type": "mutable",
             "named": false
           },
           {
@@ -6603,12 +6719,32 @@
     "type": "union_specifier",
     "named": true,
     "fields": {
-      "body": {
+      "enclosed_body": {
         "multiple": false,
         "required": false,
         "types": [
           {
             "type": "field_declaration_list",
+            "named": true
+          }
+        ]
+      },
+      "extends_list_optional": {
+        "multiple": false,
+        "required": false,
+        "types": [
+          {
+            "type": "base_class_clause",
+            "named": true
+          }
+        ]
+      },
+      "modifier_list": {
+        "multiple": false,
+        "required": false,
+        "types": [
+          {
+            "type": "virtual_specifier",
             "named": true
           }
         ]
@@ -6633,19 +6769,11 @@
       }
     },
     "children": {
-      "multiple": true,
+      "multiple": false,
       "required": false,
       "types": [
         {
-          "type": "base_class_clause",
-          "named": true
-        },
-        {
           "type": "ms_declspec_modifier",
-          "named": true
-        },
-        {
-          "type": "virtual_specifier",
           "named": true
         }
       ]
@@ -6798,6 +6926,21 @@
   },
   {
     "type": "while",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": false,
+      "required": true,
+      "types": [
+        {
+          "type": "while_clause",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "while_clause",
     "named": true,
     "fields": {
       "body": {

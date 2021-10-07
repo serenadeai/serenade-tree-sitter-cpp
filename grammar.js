@@ -38,7 +38,7 @@ module.exports = grammar(C, {
   ]),
 
   rules: {
-    top_level_item: ($, original) => choice(
+    top_level_item: ($, original) => field('statement', choice(
       original,
       $.namespace,
       $.using_declaration,
@@ -46,10 +46,10 @@ module.exports = grammar(C, {
       $.static_assert_declaration,
       $.template_declaration,
       $.template_instantiation,
-      alias($.constructor_or_destructor_definition, $.function_definition),
-      alias($.operator_cast_definition, $.function_definition),
-      alias($.operator_cast_declaration, $.declaration),
-    ),
+      $.constructor_or_destructor_definition,
+      $.operator_cast_definition,
+      $.operator_cast_declaration,
+    )),
 
     // Types
 
@@ -77,11 +77,11 @@ module.exports = grammar(C, {
       ))
     ),
 
-    type_qualifier: ($, original) => choice(
+    type_qualifier: ($, original) => field('modifier', choice(
       original,
       'mutable',
       'constexpr'
-    ),
+    )),
 
     // When used in a trailing return type, these specifiers can now occur immediately before
     // a compound statement. This introduces a shift/reduce conflict that needs to be resolved
@@ -90,27 +90,27 @@ module.exports = grammar(C, {
       'class',
       optional($.ms_declspec_modifier),
       optional(field('name', $._class_name)), 
-      optional($.virtual_specifier),
-      optional($.base_class_clause),
-      optional(field('body', $.field_declaration_list))
+      optional_with_placeholder('modifier_list', $.virtual_specifier),
+      optional_with_placeholder('extends_list_optional', $.base_class_clause),
+      optional(field('enclosed_body', $.field_declaration_list))
     )),
 
     union_specifier: $ => prec.right(seq(
       'union',
       optional($.ms_declspec_modifier),
       optional(field('name', $._class_name)), 
-      optional($.virtual_specifier),
-      optional($.base_class_clause),
-      optional(field('body', $.field_declaration_list)) 
+      optional_with_placeholder('modifier_list', $.virtual_specifier),
+      optional_with_placeholder('extends_list_optional', $.base_class_clause),
+      optional(field('enclosed_body', $.field_declaration_list)) 
     )),
 
     struct_specifier: $ => prec.right(seq(
       'struct',
       optional($.ms_declspec_modifier),
       optional(field('name', $._class_name)), 
-      optional($.virtual_specifier),
-      optional($.base_class_clause),
-      optional(field('body', $.field_declaration_list))
+      optional_with_placeholder('modifier_list', $.virtual_specifier),
+      optional_with_placeholder('extends_list_optional', $.base_class_clause),
+      optional(field('enclosed_body', $.field_declaration_list))
     )),
 
     _class_name: $ => prec.right(choice(
@@ -156,9 +156,9 @@ module.exports = grammar(C, {
         seq(
           field('name', $._class_name),
           optional($._enum_base_clause),
-          optional(field('body', $.enumerator_list_block))
+          optional(field('enclosed_body', $.enumerator_list_block))
         ),
-        field('body', $.enumerator_list_block)
+        field('enclosed_body', $.enumerator_list_block)
       )
     )),
 
@@ -203,10 +203,10 @@ module.exports = grammar(C, {
         $.declaration,
         $.template_declaration,
         $.function_definition,
-        alias($.constructor_or_destructor_declaration, $.declaration),
-        alias($.constructor_or_destructor_definition, $.function_definition),
-        alias($.operator_cast_declaration, $.declaration),
-        alias($.operator_cast_definition, $.function_definition),
+        $.constructor_or_destructor_declaration,
+        $.constructor_or_destructor_definition,
+        $.operator_cast_declaration,
+        $.operator_cast_definition,
       )
     ),
 
@@ -298,15 +298,17 @@ module.exports = grammar(C, {
       $.variadic_declarator
     ),
 
+    init_list_declarator: $ => seq(
+      field('assignment_variable', $._declarator),
+      field('assignment_value', choice(
+        $.argument_list_block,
+        $.initializer_list
+      ))
+    ),
+
     init_declarator: ($, original) => choice(
       original,
-      seq(
-        field('declarator', $._declarator),
-        field('value', choice(
-          $.argument_list_block,
-          $.initializer_list
-        ))
-      )
+      $.init_list_declarator
     ),
 
     operator_cast: $ => prec(1, seq(
@@ -575,7 +577,7 @@ module.exports = grammar(C, {
     namespace: $ => seq(
       'namespace',
       field('name', optional($.identifier)),
-      field('body', $.declaration_list)
+      field('enclosed_body', $.declaration_list)
     ),
 
     using_declaration: $ => seq(
