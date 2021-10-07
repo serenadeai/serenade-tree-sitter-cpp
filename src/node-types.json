@@ -185,6 +185,24 @@
     "type": "abstract_function_declarator",
     "named": true,
     "fields": {
+      "function_modifier_list": {
+        "multiple": true,
+        "required": false,
+        "types": [
+          {
+            "type": "noexcept",
+            "named": true
+          },
+          {
+            "type": "throw_specifier",
+            "named": true
+          },
+          {
+            "type": "type_qualifier",
+            "named": true
+          }
+        ]
+      },
       "identifier": {
         "multiple": false,
         "required": false,
@@ -220,29 +238,17 @@
             "named": true
           }
         ]
+      },
+      "return_type_optional": {
+        "multiple": false,
+        "required": false,
+        "types": [
+          {
+            "type": "trailing_return_type",
+            "named": true
+          }
+        ]
       }
-    },
-    "children": {
-      "multiple": true,
-      "required": false,
-      "types": [
-        {
-          "type": "noexcept",
-          "named": true
-        },
-        {
-          "type": "throw_specifier",
-          "named": true
-        },
-        {
-          "type": "trailing_return_type",
-          "named": true
-        },
-        {
-          "type": "type_qualifier",
-          "named": true
-        }
-      ]
     }
   },
   {
@@ -1532,6 +1538,86 @@
     }
   },
   {
+    "type": "constructor_or_destructor_declaration",
+    "named": true,
+    "fields": {
+      "declarator": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "function_declarator",
+            "named": true
+          }
+        ]
+      },
+      "modifier_list": {
+        "multiple": false,
+        "required": false,
+        "types": [
+          {
+            "type": "constructor_specifiers",
+            "named": true
+          }
+        ]
+      }
+    }
+  },
+  {
+    "type": "constructor_or_destructor_definition",
+    "named": true,
+    "fields": {
+      "body": {
+        "multiple": false,
+        "required": false,
+        "types": [
+          {
+            "type": "enclosed_body",
+            "named": true
+          }
+        ]
+      },
+      "declarator": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "function_declarator",
+            "named": true
+          }
+        ]
+      },
+      "modifier_list": {
+        "multiple": false,
+        "required": false,
+        "types": [
+          {
+            "type": "constructor_specifiers",
+            "named": true
+          }
+        ]
+      }
+    },
+    "children": {
+      "multiple": true,
+      "required": false,
+      "types": [
+        {
+          "type": "default_method_clause",
+          "named": true
+        },
+        {
+          "type": "delete_method_clause",
+          "named": true
+        },
+        {
+          "type": "field_initializer_list",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
     "type": "constructor_specifiers",
     "named": true,
     "fields": {},
@@ -2282,7 +2368,11 @@
             "named": true
           },
           {
-            "type": "declaration",
+            "type": "constructor_or_destructor_declaration",
+            "named": true
+          },
+          {
+            "type": "constructor_or_destructor_definition",
             "named": true
           },
           {
@@ -2294,7 +2384,15 @@
             "named": true
           },
           {
-            "type": "function_definition",
+            "type": "inline_method_definition",
+            "named": true
+          },
+          {
+            "type": "operator_cast_declaration",
+            "named": true
+          },
+          {
+            "type": "operator_cast_definition",
             "named": true
           },
           {
@@ -2370,7 +2468,7 @@
           "named": true
         },
         {
-          "type": "reference_declarator",
+          "type": "reference_field_declarator",
           "named": true
         },
         {
@@ -2669,6 +2767,28 @@
     "type": "function_declarator",
     "named": true,
     "fields": {
+      "function_modifier_list": {
+        "multiple": true,
+        "required": false,
+        "types": [
+          {
+            "type": "noexcept",
+            "named": true
+          },
+          {
+            "type": "throw_specifier",
+            "named": true
+          },
+          {
+            "type": "type_qualifier",
+            "named": true
+          },
+          {
+            "type": "virtual_specifier",
+            "named": true
+          }
+        ]
+      },
       "identifier": {
         "multiple": false,
         "required": true,
@@ -2728,6 +2848,16 @@
             "named": true
           }
         ]
+      },
+      "return_type_optional": {
+        "multiple": false,
+        "required": false,
+        "types": [
+          {
+            "type": "trailing_return_type",
+            "named": true
+          }
+        ]
       }
     },
     "children": {
@@ -2736,26 +2866,6 @@
       "types": [
         {
           "type": "attribute_specifier",
-          "named": true
-        },
-        {
-          "type": "noexcept",
-          "named": true
-        },
-        {
-          "type": "throw_specifier",
-          "named": true
-        },
-        {
-          "type": "trailing_return_type",
-          "named": true
-        },
-        {
-          "type": "type_qualifier",
-          "named": true
-        },
-        {
-          "type": "virtual_specifier",
           "named": true
         }
       ]
@@ -2785,10 +2895,6 @@
           },
           {
             "type": "destructor_name",
-            "named": true
-          },
-          {
-            "type": "field_declarator",
             "named": true
           },
           {
@@ -2871,10 +2977,6 @@
         {
           "type": "ms_call_modifier",
           "named": true
-        },
-        {
-          "type": "virtual_function_specifier",
-          "named": true
         }
       ]
     }
@@ -2883,6 +2985,28 @@
     "type": "function_field_declarator",
     "named": true,
     "fields": {
+      "function_modifier_list": {
+        "multiple": true,
+        "required": false,
+        "types": [
+          {
+            "type": "noexcept",
+            "named": true
+          },
+          {
+            "type": "throw_specifier",
+            "named": true
+          },
+          {
+            "type": "type_qualifier",
+            "named": true
+          },
+          {
+            "type": "virtual_specifier",
+            "named": true
+          }
+        ]
+      },
       "identifier": {
         "multiple": false,
         "required": true,
@@ -2902,33 +3026,17 @@
             "named": true
           }
         ]
+      },
+      "return_type_optional": {
+        "multiple": false,
+        "required": false,
+        "types": [
+          {
+            "type": "trailing_return_type",
+            "named": true
+          }
+        ]
       }
-    },
-    "children": {
-      "multiple": true,
-      "required": false,
-      "types": [
-        {
-          "type": "noexcept",
-          "named": true
-        },
-        {
-          "type": "throw_specifier",
-          "named": true
-        },
-        {
-          "type": "trailing_return_type",
-          "named": true
-        },
-        {
-          "type": "type_qualifier",
-          "named": true
-        },
-        {
-          "type": "virtual_specifier",
-          "named": true
-        }
-      ]
     }
   },
   {
@@ -3236,6 +3344,58 @@
     }
   },
   {
+    "type": "inline_method_definition",
+    "named": true,
+    "fields": {
+      "body": {
+        "multiple": false,
+        "required": false,
+        "types": [
+          {
+            "type": "enclosed_body",
+            "named": true
+          }
+        ]
+      },
+      "declarator": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "field_declarator",
+            "named": true
+          }
+        ]
+      }
+    },
+    "children": {
+      "multiple": true,
+      "required": true,
+      "types": [
+        {
+          "type": "attribute",
+          "named": true
+        },
+        {
+          "type": "declaration_specifiers",
+          "named": true
+        },
+        {
+          "type": "default_method_clause",
+          "named": true
+        },
+        {
+          "type": "delete_method_clause",
+          "named": true
+        },
+        {
+          "type": "virtual_function_specifier",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
     "type": "labeled_statement",
     "named": true,
     "fields": {
@@ -3436,7 +3596,7 @@
     "fields": {}
   },
   {
-    "type": "namespace_definition",
+    "type": "namespace",
     "named": true,
     "fields": {
       "body": {
@@ -3584,16 +3744,29 @@
   {
     "type": "noexcept",
     "named": true,
-    "fields": {},
-    "children": {
-      "multiple": false,
-      "required": false,
-      "types": [
-        {
-          "type": "_expression",
-          "named": true
-        }
-      ]
+    "fields": {
+      "modifier": {
+        "multiple": true,
+        "required": true,
+        "types": [
+          {
+            "type": "(",
+            "named": false
+          },
+          {
+            "type": ")",
+            "named": false
+          },
+          {
+            "type": "_expression",
+            "named": true
+          },
+          {
+            "type": "noexcept",
+            "named": false
+          }
+        ]
+      }
     }
   },
   {
@@ -3651,6 +3824,92 @@
       "types": [
         {
           "type": "declaration_specifiers",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "operator_cast_declaration",
+    "named": true,
+    "fields": {
+      "declarator": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "operator_cast",
+            "named": true
+          }
+        ]
+      },
+      "default_value": {
+        "multiple": false,
+        "required": false,
+        "types": [
+          {
+            "type": "_expression",
+            "named": true
+          }
+        ]
+      },
+      "modifier_list": {
+        "multiple": false,
+        "required": false,
+        "types": [
+          {
+            "type": "constructor_specifiers",
+            "named": true
+          }
+        ]
+      }
+    }
+  },
+  {
+    "type": "operator_cast_definition",
+    "named": true,
+    "fields": {
+      "body": {
+        "multiple": false,
+        "required": false,
+        "types": [
+          {
+            "type": "enclosed_body",
+            "named": true
+          }
+        ]
+      },
+      "declarator": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "operator_cast",
+            "named": true
+          }
+        ]
+      },
+      "modifier_list": {
+        "multiple": false,
+        "required": false,
+        "types": [
+          {
+            "type": "constructor_specifiers",
+            "named": true
+          }
+        ]
+      }
+    },
+    "children": {
+      "multiple": false,
+      "required": false,
+      "types": [
+        {
+          "type": "default_method_clause",
+          "named": true
+        },
+        {
+          "type": "delete_method_clause",
           "named": true
         }
       ]
@@ -4427,7 +4686,11 @@
           "named": true
         },
         {
-          "type": "declaration",
+          "type": "constructor_or_destructor_declaration",
+          "named": true
+        },
+        {
+          "type": "constructor_or_destructor_definition",
           "named": true
         },
         {
@@ -4439,7 +4702,15 @@
           "named": true
         },
         {
-          "type": "function_definition",
+          "type": "inline_method_definition",
+          "named": true
+        },
+        {
+          "type": "operator_cast_declaration",
+          "named": true
+        },
+        {
+          "type": "operator_cast_definition",
           "named": true
         },
         {
@@ -4502,7 +4773,11 @@
           "named": true
         },
         {
-          "type": "declaration",
+          "type": "constructor_or_destructor_declaration",
+          "named": true
+        },
+        {
+          "type": "constructor_or_destructor_definition",
           "named": true
         },
         {
@@ -4514,7 +4789,15 @@
           "named": true
         },
         {
-          "type": "function_definition",
+          "type": "inline_method_definition",
+          "named": true
+        },
+        {
+          "type": "operator_cast_declaration",
+          "named": true
+        },
+        {
+          "type": "operator_cast_definition",
           "named": true
         },
         {
@@ -4666,7 +4949,11 @@
           "named": true
         },
         {
-          "type": "declaration",
+          "type": "constructor_or_destructor_declaration",
+          "named": true
+        },
+        {
+          "type": "constructor_or_destructor_definition",
           "named": true
         },
         {
@@ -4678,7 +4965,15 @@
           "named": true
         },
         {
-          "type": "function_definition",
+          "type": "inline_method_definition",
+          "named": true
+        },
+        {
+          "type": "operator_cast_declaration",
+          "named": true
+        },
+        {
+          "type": "operator_cast_definition",
           "named": true
         },
         {
@@ -4766,7 +5061,11 @@
           "named": true
         },
         {
-          "type": "declaration",
+          "type": "constructor_or_destructor_declaration",
+          "named": true
+        },
+        {
+          "type": "constructor_or_destructor_definition",
           "named": true
         },
         {
@@ -4778,7 +5077,15 @@
           "named": true
         },
         {
-          "type": "function_definition",
+          "type": "inline_method_definition",
+          "named": true
+        },
+        {
+          "type": "operator_cast_declaration",
+          "named": true
+        },
+        {
+          "type": "operator_cast_definition",
           "named": true
         },
         {
@@ -4910,10 +5217,6 @@
           "named": true
         },
         {
-          "type": "field_declarator",
-          "named": true
-        },
-        {
           "type": "function_declarator",
           "named": true
         },
@@ -4951,6 +5254,21 @@
         },
         {
           "type": "variadic_declarator",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "reference_field_declarator",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": false,
+      "required": true,
+      "types": [
+        {
+          "type": "field_declarator",
           "named": true
         }
       ]
@@ -5812,7 +6130,7 @@
           "named": true
         },
         {
-          "type": "namespace_definition",
+          "type": "namespace",
           "named": true
         },
         {

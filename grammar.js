@@ -40,7 +40,7 @@ module.exports = grammar(C, {
   rules: {
     top_level_item: ($, original) => choice(
       original,
-      $.namespace_definition,
+      $.namespace,
       $.using_declaration,
       $.alias_declaration,
       $.static_assert_declaration,
@@ -341,11 +341,11 @@ module.exports = grammar(C, {
     _field_declaration_list_item: ($, original) => choice(
       original,
       $.template_declaration,
-      alias($.inline_method_definition, $.function_definition),
-      alias($.constructor_or_destructor_definition, $.function_definition),
-      alias($.constructor_or_destructor_declaration, $.declaration),
-      alias($.operator_cast_definition, $.function_definition),
-      alias($.operator_cast_declaration, $.declaration),
+      $.inline_method_definition,
+      $.constructor_or_destructor_definition,
+      $.constructor_or_destructor_declaration,
+      $.operator_cast_definition,
+      $.operator_cast_declaration,
       $.friend_declaration,
       $.access_specifier,
       $.alias_declaration,
@@ -463,7 +463,7 @@ module.exports = grammar(C, {
 
     field_declarator: ($, original) => choice(
       original,
-      alias($.reference_field_declarator, $.reference_declarator),
+      $.reference_field_declarator,
       $.template_method,
       $.operator_name
     ),
@@ -481,36 +481,43 @@ module.exports = grammar(C, {
       '[', commaSep1($.identifier), ']'
     )),
 
+    // serenade note: Moved trailing return type out of the function modifier list. 
+    // not sure if it's technically allowed to have these in any order, or if this
+    // was just a simplification to the grammar. Also don't allow repeated 
+    // trailing return type. 
     function_declarator: ($, original) => prec.dynamic(1, seq(
       original,
-      repeat(choice(
-        $.type_qualifier,
-        $.virtual_specifier,
-        $.noexcept,
-        $.throw_specifier,
-        $.trailing_return_type
-      ))
+      optional_with_placeholder('function_modifier_list',
+        repeat(choice(
+          $.type_qualifier,
+          $.virtual_specifier,
+          $.noexcept,
+          $.throw_specifier
+      ))), 
+      optional_with_placeholder('return_type_optional', $.trailing_return_type)
     )),
 
     function_field_declarator: ($, original) => prec.dynamic(1, seq(
       original,
-      repeat(choice(
-        $.type_qualifier,
-        $.virtual_specifier,
-        $.noexcept,
-        $.throw_specifier,
-        $.trailing_return_type
-      ))
+      optional_with_placeholder('function_modifier_list',
+        repeat(choice(
+          $.type_qualifier,
+          $.virtual_specifier,
+          $.noexcept,
+          $.throw_specifier
+      ))), 
+      optional_with_placeholder('return_type_optional', $.trailing_return_type)
     )),
 
     abstract_function_declarator: ($, original) => prec.right(seq(
       original,
-      repeat(choice(
-        $.type_qualifier,
-        $.noexcept,
-        $.throw_specifier
-      )),
-      optional($.trailing_return_type)
+      optional_with_placeholder('function_modifier_list',
+        repeat(choice(
+          $.type_qualifier,
+          $.noexcept,
+          $.throw_specifier
+      ))),
+      optional_with_placeholder('return_type_optional', $.trailing_return_type)
     )),
 
     trailing_return_type: $ => prec.right(seq(
@@ -520,7 +527,7 @@ module.exports = grammar(C, {
       optional($._abstract_declarator)
     )),
 
-    noexcept: $ => prec.right(seq(
+    noexcept: $ => field('modifier', prec.right(seq(
       'noexcept',
       optional(
         seq(
@@ -529,7 +536,7 @@ module.exports = grammar(C, {
           ')',
         ),
       ),
-    )),
+    ))),
 
     throw_specifier: $ => seq(
       'throw',
@@ -565,7 +572,7 @@ module.exports = grammar(C, {
       alias(token(prec(1, '>')), '>')
     ),
 
-    namespace_definition: $ => seq(
+    namespace: $ => seq(
       'namespace',
       field('name', optional($.identifier)),
       field('body', $.declaration_list)
