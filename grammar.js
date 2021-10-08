@@ -119,6 +119,16 @@ module.exports = grammar(C, {
       $.template_type
     )),
 
+    declaration_specifiers: $ => seq(
+      optional_with_placeholder('modifier_list', seq(
+        // Serenade: We don't need virtual everywhere, but it's easier to just include here.
+        optional($.virtual_function_specifier), 
+        repeat($.declaration_specifier)
+      )),
+      field('type', $._type_specifier),
+      optional_with_placeholder('modifier_list', repeat($.declaration_specifier)),
+    ),
+
     virtual_specifier: $ => field('modifier', choice(
       'final', // the only legal value here for classes
       'override' // legal for functions in addition to final, plus permutations.
@@ -200,7 +210,7 @@ module.exports = grammar(C, {
       choice(
         $.empty_declaration,
         $.alias_declaration,
-        $.declaration,
+        alias($.declaration, $.field_declaration), // TODO: Not sure if this works well or is necessary.
         $.template_declaration,
         $.function_definition,
         $.constructor_or_destructor_declaration,
@@ -277,7 +287,7 @@ module.exports = grammar(C, {
       $.declaration_specifiers,
       field('declarator', optional($._declarator)),
       '=',
-      field('default_value', $._expression)
+      field('parameter_value', $._expression)
     ),
 
     variadic_parameter_declaration: $ => seq(
@@ -358,20 +368,28 @@ module.exports = grammar(C, {
 
     field_declaration: $ => seq(
       repeat($.attribute),
-      optional($.virtual_function_specifier),
+      // optional($.virtual_function_specifier),
       $.declaration_specifiers,
-      commaSep(field('declarator', $.field_declarator)),
-      optional(choice(
-        $.bitfield_clause,
-        field('default_value', $.initializer_list),
-        seq('=', field('default_value', choice($._expression, $.initializer_list)))
-      )),
+      $.field_declaration_maybe_assignment, 
       ';'
     ),
 
+    // TODO: Check if we can make this a commaSep1...
+    // if not, make this field optional in declaration..
+    field_declaration_maybe_assignment: $ => seq(
+      field('maybe_assignment_variable_list', commaSep1(alias($.field_declarator, $.maybe_assignment_variable))),
+      optional_with_placeholder('assignment_value_list_optional', $.field_declaration_assignment_value),
+    ),
+
+    field_declaration_assignment_value: $ => choice(
+      $.bitfield_clause,
+      field('assignment_value', $.initializer_list),
+      seq('=', field('assignment_value', choice($._expression, $.initializer_list)))
+    ), 
+
     inline_method_definition: $ => seq(
       repeat($.attribute),
-      optional($.virtual_function_specifier),
+      // optional($.virtual_function_specifier),
       $.declaration_specifiers,
       field('declarator', $.field_declarator),
       choice(
@@ -524,9 +542,11 @@ module.exports = grammar(C, {
 
     trailing_return_type: $ => prec.right(seq(
       '->',
-      optional($.type_qualifier),
-      $._type_specifier,
-      optional($._abstract_declarator)
+      field('return_type', seq(
+        optional($.type_qualifier),
+        $._type_specifier,
+        optional($._abstract_declarator)
+      ))
     )),
 
     noexcept: $ => field('modifier', prec.right(seq(
@@ -768,7 +788,7 @@ module.exports = grammar(C, {
       original,
       seq(
         prec(PREC.FIELD, seq(
-          field('argument', $._expression),
+          field('argument_', $._expression),
           choice('.', '->')
         )),
         field('field', choice(
