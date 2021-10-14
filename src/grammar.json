@@ -2742,35 +2742,19 @@
         "type": "SEQ",
         "members": [
           {
-            "type": "PREC",
-            "value": 1,
+            "type": "FIELD",
+            "name": "identifier",
             "content": {
-              "type": "SEQ",
-              "members": [
-                {
-                  "type": "FIELD",
-                  "name": "identifier",
-                  "content": {
-                    "type": "SYMBOL",
-                    "name": "_declarator"
-                  }
-                },
-                {
-                  "type": "FIELD",
-                  "name": "parameters",
-                  "content": {
-                    "type": "SYMBOL",
-                    "name": "parameter_list_block"
-                  }
-                },
-                {
-                  "type": "REPEAT",
-                  "content": {
-                    "type": "SYMBOL",
-                    "name": "attribute_specifier"
-                  }
-                }
-              ]
+              "type": "SYMBOL",
+              "name": "_declarator"
+            }
+          },
+          {
+            "type": "FIELD",
+            "name": "parameters",
+            "content": {
+              "type": "SYMBOL",
+              "name": "parameter_list_block"
             }
           },
           {
@@ -2784,6 +2768,10 @@
                   "content": {
                     "type": "CHOICE",
                     "members": [
+                      {
+                        "type": "SYMBOL",
+                        "name": "attribute_specifier"
+                      },
                       {
                         "type": "SYMBOL",
                         "name": "type_qualifier"

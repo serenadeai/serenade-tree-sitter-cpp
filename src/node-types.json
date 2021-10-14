@@ -2808,6 +2808,10 @@
         "required": false,
         "types": [
           {
+            "type": "attribute_specifier",
+            "named": true
+          },
+          {
             "type": "noexcept",
             "named": true
           },
@@ -2895,16 +2899,6 @@
           }
         ]
       }
-    },
-    "children": {
-      "multiple": true,
-      "required": false,
-      "types": [
-        {
-          "type": "attribute_specifier",
-          "named": true
-        }
-      ]
     }
   },
   {

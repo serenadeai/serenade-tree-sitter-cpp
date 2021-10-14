@@ -506,9 +506,12 @@ module.exports = grammar(C, {
     // was just a simplification to the grammar. Also don't allow repeated 
     // trailing return type. 
     function_declarator: ($, original) => prec.dynamic(1, seq(
-      original,
+      field('identifier', $._declarator),
+      field('parameters', $.parameter_list_block),
+      // optional_with_placeholder('modifier_list', repeat($.attribute_specifier)),,
       optional_with_placeholder('function_modifier_list',
         repeat(choice(
+          $.attribute_specifier,
           $.type_qualifier,
           $.virtual_specifier,
           $.noexcept,
