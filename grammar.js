@@ -15,15 +15,15 @@ module.exports = grammar(C, {
 
   conflicts: ($, original) => original.concat([
     [$.template_function, $.template_type],
-    [$.template_function, $.template_type, $._expression],
-    [$.template_function, $._expression],
+    [$.template_function, $.template_type, $.expression_],
+    [$.template_function, $.expression_],
     [$.template_method, $.template_type, $.field_expression],
     [$.scoped_type_identifier, $.scoped_identifier],
     [$.scoped_type_identifier, $.scoped_field_identifier],
     [$.comma_expression, $.initializer_list],
-    [$._expression, $._declarator],
-    [$._expression, $.structured_binding_declarator],
-    [$._expression, $._declarator, $._type_specifier],
+    [$.expression_, $._declarator],
+    [$.expression_, $.structured_binding_declarator],
+    [$.expression_, $._declarator, $._type_specifier],
     [$.parameter_list_block, $.argument_list_block],
     [$._type_specifier, $.call_expression],
     [$.declaration_specifier, $.operator_cast_declaration, $.operator_cast_definition, $.constructor_or_destructor_definition],
@@ -56,7 +56,7 @@ module.exports = grammar(C, {
     decltype: $ => seq(
       'decltype',
       '(',
-      $._expression,
+      $.expression_,
       ')',
     ),
 
@@ -143,7 +143,7 @@ module.exports = grammar(C, {
       prec(PREC.CALL, seq(
         'explicit',
         '(',
-        $._expression,
+        $.expression_,
         ')'
       ))
     ),
@@ -285,9 +285,9 @@ module.exports = grammar(C, {
 
     optional_parameter_declaration: $ => seq(
       $.declaration_specifiers,
-      field('declarator', optional($._declarator)),
+      optional(field('declarator', $._declarator)),
       '=',
-      field('parameter_value', $._expression)
+      field('parameter_value', $.expression_)
     ),
 
     variadic_parameter_declaration: $ => seq(
@@ -323,7 +323,7 @@ module.exports = grammar(C, {
 
     operator_cast: $ => prec(1, seq(
       optional(seq(
-        field('namespace', optional(choice(
+        optional(field('namespace', choice(
           $._namespace_identifier,
           $.template_type,
           $.scoped_namespace_identifier
@@ -350,7 +350,7 @@ module.exports = grammar(C, {
       optional('...')
     )),
 
-    _field_declaration_list_item: ($, original) => choice(
+    field_declaration_list_item_: ($, original) => choice(
       original,
       $.template_declaration,
       $.inline_method_definition,
@@ -384,7 +384,7 @@ module.exports = grammar(C, {
     field_declaration_assignment_value: $ => choice(
       $.bitfield_clause,
       field('assignment_value', $.initializer_list),
-      seq('=', field('assignment_value', choice($._expression, $.initializer_list)))
+      seq('=', field('assignment_value', choice($.expression_, $.initializer_list)))
     ), 
 
     inline_method_definition: $ => seq(
@@ -422,7 +422,7 @@ module.exports = grammar(C, {
     operator_cast_declaration: $ => prec(1, seq(
       optional_with_placeholder('modifier_list', $.constructor_specifiers),
       field('declarator', $.operator_cast),
-      optional(seq('=', field('default_value', $._expression))),
+      optional(seq('=', field('default_value', $.expression_))),
       ';'
     )),
 
@@ -557,7 +557,7 @@ module.exports = grammar(C, {
       optional(
         seq(
           '(',
-          optional($._expression),
+          optional($.expression_),
           ')',
         ),
       ),
@@ -592,14 +592,14 @@ module.exports = grammar(C, {
       commaSep(choice(
         prec.dynamic(3, $.type_descriptor),
         prec.dynamic(2, alias($.type_parameter_pack_expansion, $.parameter_pack_expansion)),
-        prec.dynamic(1, $._expression)
+        prec.dynamic(1, $.expression_)
       )),
       alias(token(prec(1, '>')), '>')
     ),
 
     namespace: $ => seq(
       'namespace',
-      field('name', optional($.identifier)),
+      optional(field('name', $.identifier)),
       field('enclosed_body', $.declaration_list)
     ),
 
@@ -624,7 +624,7 @@ module.exports = grammar(C, {
     static_assert_declaration: $ => seq(
       'static_assert',
       '(',
-      field('condition', $._expression),
+      field('condition', $.expression_),
       optional(seq(
         ',',
         field('message', choice(
@@ -658,12 +658,12 @@ module.exports = grammar(C, {
     condition: $ => seq(
       choice(
         seq(
-          field('initializer', optional(choice(
+          optional(field('initializer', choice(
             $.declaration,
             $.expression_statement
           ))),
           field('value', choice(
-            $._expression,
+            $.expression_,
             $.comma_expression
           )),
         ),
@@ -677,7 +677,7 @@ module.exports = grammar(C, {
       choice(
         seq(
           '=',
-          field('value', $._expression),
+          field('value', $.expression_),
         ),
         field('value', $.initializer_list),
       )
@@ -694,7 +694,7 @@ module.exports = grammar(C, {
       field('block_iterator', seq($.declaration_specifiers, $._declarator)),
       ':',
       field('block_collection', choice(
-        $._expression,
+        $.expression_,
         $.initializer_list,
       )),
       ')',
@@ -708,7 +708,7 @@ module.exports = grammar(C, {
 
     throw: $ => seq(
       'throw',
-      optional($._expression),
+      optional($.expression_),
       ';'
     ),
     
@@ -737,13 +737,13 @@ module.exports = grammar(C, {
 
     attribute: $ => seq(
       '[[',
-      commaSep1($._expression),
+      commaSep1($.expression_),
       ']]'
     ),
 
     // Expressions
 
-    _expression: ($, original) => choice(
+    expression_: ($, original) => choice(
       original,
       $.template_function,
       $.scoped_identifier,
@@ -764,10 +764,10 @@ module.exports = grammar(C, {
     new_expression: $ => prec.right(PREC.NEW, seq(
       optional('::'),
       'new',
-      field('placement', optional($.argument_list_block)),
+      optional(field('placement', $.argument_list_block)),
       field('type', $._type_specifier),
-      field('declarator', optional($.new_declarator)),
-      field('arguments', optional(choice(
+      optional(field('declarator', $.new_declarator)),
+      optional(field('arguments', choice(
         $.argument_list_block,
         $.initializer_list
       )))
@@ -775,7 +775,7 @@ module.exports = grammar(C, {
 
     new_declarator: $ => prec.right(seq(
       '[',
-      field('length', $._expression),
+      field('length', $.expression_),
       ']',
       optional($.new_declarator)
     )),
@@ -784,14 +784,14 @@ module.exports = grammar(C, {
       optional('::'),
       'delete',
       optional(seq('[', ']')),
-      $._expression
+      $.expression_
     ),
 
     field_expression: ($, original) => choice(
       original,
       seq(
         prec(PREC.FIELD, seq(
-          field('argument_', $._expression),
+          field('argument_', $.expression_),
           choice('.', '->')
         )),
         field('field', choice(
@@ -811,10 +811,10 @@ module.exports = grammar(C, {
       '[',
       choice(
         $.lambda_default_capture,
-        commaSep($._expression),
+        commaSep($.expression_),
         seq(
           $.lambda_default_capture,
-          ',', commaSep1($._expression)
+          ',', commaSep1($.expression_)
         )
       ),
       ']'
@@ -823,7 +823,7 @@ module.exports = grammar(C, {
     lambda_default_capture: $ => choice('=', '&'),
 
     parameter_pack_expansion: $ => prec(-1, seq(
-      field('pattern', $._expression),
+      field('pattern', $.expression_),
       '...'
     )),
 
