@@ -83,6 +83,8 @@ module.exports = grammar(C, {
       'constexpr'
     )),
 
+    constexpr_modifier: $ => field('modifier', 'constexpr'),
+
     // When used in a trailing return type, these specifiers can now occur immediately before
     // a compound statement. This introduces a shift/reduce conflict that needs to be resolved
     // with an associativity.
@@ -165,16 +167,18 @@ module.exports = grammar(C, {
       choice(
         seq(
           field('name', $._class_name),
-          optional($._enum_base_clause),
+          optional_with_placeholder('extends_optional', $.enum_base_clause),
           optional(field('enclosed_body', $.enumerator_list_block))
         ),
         field('enclosed_body', $.enumerator_list_block)
       )
     )),
 
-    _enum_base_clause: $ => prec.left(seq(
+    // field('extends_list', commaSep1($.extends_type))
+
+    enum_base_clause: $ => prec.left(seq(
       ':',
-      field('base', choice($.scoped_type_identifier, $._type_identifier, $.sized_type_specifier))
+      field('extends_type', choice($.scoped_type_identifier, $._type_identifier, $.sized_type_specifier))
     )),
 
     // The `auto` storage class is removed in C++0x in order to allow for the `auto` type.
@@ -647,12 +651,22 @@ module.exports = grammar(C, {
 
     // If statement has constexpr which is new. 
 
-    if_clause: $ => prec.dynamic(0, 
-      seq('if', optional('constexpr'), '(', $.condition, ')', $.statement),
+    if_clause: $ => prec.dynamic(0, seq(
+      'if', 
+      optional_with_placeholder('modifier_list', $.constexpr_modifier), 
+      '(', 
+      $.condition, 
+      ')', 
+      $.statement),
     ),
 
     else_if_clause: $ => prec.dynamic(1, seq(
-      'else', 'if', optional('constexpr'), '(', $.condition, ')', $.statement
+      'else', 'if', 
+      optional_with_placeholder('modifier_list', $.constexpr_modifier),
+      '(', 
+      $.condition, 
+      ')', 
+      $.statement
     )), 
 
     condition: $ => seq(

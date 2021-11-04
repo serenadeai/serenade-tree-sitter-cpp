@@ -3770,11 +3770,19 @@
                     "type": "CHOICE",
                     "members": [
                       {
-                        "type": "SYMBOL",
-                        "name": "_enum_base_clause"
+                        "type": "FIELD",
+                        "name": "extends_optional",
+                        "content": {
+                          "type": "SYMBOL",
+                          "name": "enum_base_clause"
+                        }
                       },
                       {
-                        "type": "BLANK"
+                        "type": "FIELD",
+                        "name": "extends_optional",
+                        "content": {
+                          "type": "BLANK"
+                        }
                       }
                     ]
                   },
@@ -4416,7 +4424,7 @@
               "members": [
                 {
                   "type": "FIELD",
-                  "name": "declarator",
+                  "name": "identifier",
                   "content": {
                     "type": "CHOICE",
                     "members": [
@@ -4701,11 +4709,19 @@
             "type": "CHOICE",
             "members": [
               {
-                "type": "STRING",
-                "value": "constexpr"
+                "type": "FIELD",
+                "name": "modifier_list",
+                "content": {
+                  "type": "SYMBOL",
+                  "name": "constexpr_modifier"
+                }
               },
               {
-                "type": "BLANK"
+                "type": "FIELD",
+                "name": "modifier_list",
+                "content": {
+                  "type": "BLANK"
+                }
               }
             ]
           },
@@ -4746,11 +4762,19 @@
             "type": "CHOICE",
             "members": [
               {
-                "type": "STRING",
-                "value": "constexpr"
+                "type": "FIELD",
+                "name": "modifier_list",
+                "content": {
+                  "type": "SYMBOL",
+                  "name": "constexpr_modifier"
+                }
               },
               {
-                "type": "BLANK"
+                "type": "FIELD",
+                "name": "modifier_list",
+                "content": {
+                  "type": "BLANK"
+                }
               }
             ]
           },
@@ -7690,6 +7714,14 @@
         }
       ]
     },
+    "constexpr_modifier": {
+      "type": "FIELD",
+      "name": "modifier",
+      "content": {
+        "type": "STRING",
+        "value": "constexpr"
+      }
+    },
     "class_specifier": {
       "type": "PREC_RIGHT",
       "value": 0,
@@ -7956,7 +7988,7 @@
         }
       ]
     },
-    "_enum_base_clause": {
+    "enum_base_clause": {
       "type": "PREC_LEFT",
       "value": 0,
       "content": {
@@ -7968,7 +8000,7 @@
           },
           {
             "type": "FIELD",
-            "name": "base",
+            "name": "extends_type",
             "content": {
               "type": "CHOICE",
               "members": [
