@@ -35,5 +35,12 @@
         "node_modules/tree-sitter-c/queries/highlights.scm"
       ]
     }
-  ]
+  ],
+  "prettier": {
+    "trailingComma": "es5",
+    "tabWidth": 2,
+    "semi": false,
+    "arrowParens": "avoid",
+    "singleQuote": true
+  }
 }
