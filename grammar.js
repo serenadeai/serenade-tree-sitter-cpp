@@ -690,7 +690,17 @@ module.exports = grammar(C, {
       seq(
         'namespace',
         optional(field('name', $.identifier)),
-        field('enclosed_body', $.declaration_list)
+        field('enclosed_body', $.namespace_member_block)
+      ),
+
+    namespace_member_block: $ =>
+      seq(
+        '{',
+        optional_with_placeholder(
+          'namespace_member_list',
+          repeat($.top_level_item)
+        ),
+        '}'
       ),
 
     using_declaration: $ =>
