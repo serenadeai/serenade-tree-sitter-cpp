@@ -254,15 +254,21 @@ module.exports = grammar(C, {
     template_parameter_list: $ =>
       seq(
         '<',
-        commaSep(
-          choice(
-            $.parameter_declaration,
-            $.optional_parameter_declaration,
-            $.type_parameter_declaration,
-            $.variadic_parameter_declaration,
-            $.variadic_type_parameter_declaration,
-            $.optional_type_parameter_declaration,
-            $.template_template_parameter_declaration
+        field(
+          'type_parameter_list',
+          commaSep(
+            alias(
+              choice(
+                $.parameter_declaration,
+                $.optional_parameter_declaration,
+                $.type_parameter_declaration,
+                $.variadic_parameter_declaration,
+                $.variadic_type_parameter_declaration,
+                $.optional_type_parameter_declaration,
+                $.template_template_parameter_declaration
+              ),
+              $.type_parameter
+            )
           )
         ),
         alias(token(prec(1, '>')), '>')
@@ -673,14 +679,23 @@ module.exports = grammar(C, {
     template_argument_list: $ =>
       seq(
         '<',
-        commaSep(
-          choice(
-            prec.dynamic(3, $.type_descriptor),
-            prec.dynamic(
-              2,
-              alias($.type_parameter_pack_expansion, $.parameter_pack_expansion)
-            ),
-            prec.dynamic(1, $.expression_)
+        field(
+          'type_argument_list',
+          commaSep(
+            alias(
+              choice(
+                prec.dynamic(3, $.type_descriptor),
+                prec.dynamic(
+                  2,
+                  alias(
+                    $.type_parameter_pack_expansion,
+                    $.parameter_pack_expansion
+                  )
+                ),
+                prec.dynamic(1, $.expression_)
+              ),
+              $.type_argument
+            )
           )
         ),
         alias(token(prec(1, '>')), '>')
