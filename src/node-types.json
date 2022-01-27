@@ -3837,16 +3837,6 @@
           }
         ]
       },
-      "captures": {
-        "multiple": false,
-        "required": true,
-        "types": [
-          {
-            "type": "lambda_capture_specifier",
-            "named": true
-          }
-        ]
-      },
       "declarator": {
         "multiple": false,
         "required": false,
@@ -3857,6 +3847,16 @@
           }
         ]
       }
+    },
+    "children": {
+      "multiple": false,
+      "required": false,
+      "types": [
+        {
+          "type": "lambda_capture_specifier",
+          "named": true
+        }
+      ]
     }
   },
   {
@@ -3865,7 +3865,7 @@
     "fields": {},
     "children": {
       "multiple": true,
-      "required": false,
+      "required": true,
       "types": [
         {
           "type": "expression_",
