@@ -10335,12 +10335,24 @@
       "type": "SEQ",
       "members": [
         {
-          "type": "FIELD",
-          "name": "captures",
-          "content": {
-            "type": "SYMBOL",
-            "name": "lambda_capture_specifier"
-          }
+          "type": "STRING",
+          "value": "["
+        },
+        {
+          "type": "CHOICE",
+          "members": [
+            {
+              "type": "SYMBOL",
+              "name": "lambda_capture_specifier"
+            },
+            {
+              "type": "BLANK"
+            }
+          ]
+        },
+        {
+          "type": "STRING",
+          "value": "]"
         },
         {
           "type": "CHOICE",
@@ -10375,10 +10387,6 @@
         "type": "SEQ",
         "members": [
           {
-            "type": "STRING",
-            "value": "["
-          },
-          {
             "type": "CHOICE",
             "members": [
               {
@@ -10386,35 +10394,27 @@
                 "name": "lambda_default_capture"
               },
               {
-                "type": "CHOICE",
+                "type": "SEQ",
                 "members": [
                   {
-                    "type": "SEQ",
-                    "members": [
-                      {
-                        "type": "SYMBOL",
-                        "name": "expression_"
-                      },
-                      {
-                        "type": "REPEAT",
-                        "content": {
-                          "type": "SEQ",
-                          "members": [
-                            {
-                              "type": "STRING",
-                              "value": ","
-                            },
-                            {
-                              "type": "SYMBOL",
-                              "name": "expression_"
-                            }
-                          ]
-                        }
-                      }
-                    ]
+                    "type": "SYMBOL",
+                    "name": "expression_"
                   },
                   {
-                    "type": "BLANK"
+                    "type": "REPEAT",
+                    "content": {
+                      "type": "SEQ",
+                      "members": [
+                        {
+                          "type": "STRING",
+                          "value": ","
+                        },
+                        {
+                          "type": "SYMBOL",
+                          "name": "expression_"
+                        }
+                      ]
+                    }
                   }
                 ]
               },
@@ -10457,10 +10457,6 @@
                 ]
               }
             ]
-          },
-          {
-            "type": "STRING",
-            "value": "]"
           }
         ]
       }
@@ -11081,6 +11077,14 @@
     ],
     [
       "base_class_clause"
+    ],
+    [
+      "declaration_specifier",
+      "type_descriptor"
+    ],
+    [
+      "declaration_specifiers",
+      "type_descriptor"
     ]
   ],
   "precedences": [],

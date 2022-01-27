@@ -35,6 +35,8 @@ module.exports = grammar(C, {
 
       [$.extends_type],
       [$.base_class_clause],
+      [$.declaration_specifier, $.type_descriptor],
+      [$.declaration_specifiers, $.type_descriptor],
     ]),
 
   inline: ($, original) => original.concat([$._namespace_identifier]),
@@ -910,7 +912,9 @@ module.exports = grammar(C, {
 
     lambda: $ =>
       seq(
-        field('captures', $.lambda_capture_specifier),
+        '[',
+        optional($.lambda_capture_specifier),
+        ']',
         optional(field('declarator', $.abstract_function_declarator)),
         field('body', $.enclosed_body)
       ),
@@ -919,13 +923,11 @@ module.exports = grammar(C, {
       prec(
         PREC.LAMBDA,
         seq(
-          '[',
           choice(
             $.lambda_default_capture,
-            commaSep($.expression_),
+            commaSep1($.expression_),
             seq($.lambda_default_capture, ',', commaSep1($.expression_))
-          ),
-          ']'
+          )
         )
       ),
 
