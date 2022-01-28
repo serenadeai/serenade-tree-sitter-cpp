@@ -1008,16 +1008,6 @@
     "type": "case",
     "named": true,
     "fields": {
-      "case_statement_list": {
-        "multiple": false,
-        "required": false,
-        "types": [
-          {
-            "type": "case_statement_list",
-            "named": true
-          }
-        ]
-      },
       "condition": {
         "multiple": false,
         "required": true,
@@ -1027,74 +1017,17 @@
             "named": true
           }
         ]
+      },
+      "statement_list": {
+        "multiple": false,
+        "required": false,
+        "types": [
+          {
+            "type": "statement_list",
+            "named": true
+          }
+        ]
       }
-    }
-  },
-  {
-    "type": "case_statement_list",
-    "named": true,
-    "fields": {},
-    "children": {
-      "multiple": true,
-      "required": true,
-      "types": [
-        {
-          "type": "break_statement",
-          "named": true
-        },
-        {
-          "type": "continue_statement",
-          "named": true
-        },
-        {
-          "type": "declaration",
-          "named": true
-        },
-        {
-          "type": "do_statement",
-          "named": true
-        },
-        {
-          "type": "enclosed_body",
-          "named": true
-        },
-        {
-          "type": "expression_statement",
-          "named": true
-        },
-        {
-          "type": "for",
-          "named": true
-        },
-        {
-          "type": "goto_statement",
-          "named": true
-        },
-        {
-          "type": "if",
-          "named": true
-        },
-        {
-          "type": "labeled_statement",
-          "named": true
-        },
-        {
-          "type": "return",
-          "named": true
-        },
-        {
-          "type": "switch",
-          "named": true
-        },
-        {
-          "type": "type_definition",
-          "named": true
-        },
-        {
-          "type": "while",
-          "named": true
-        }
-      ]
     }
   },
   {
@@ -2006,12 +1939,12 @@
     "type": "default_case",
     "named": true,
     "fields": {
-      "case_statement_list": {
+      "statement_list": {
         "multiple": false,
         "required": false,
         "types": [
           {
-            "type": "case_statement_list",
+            "type": "statement_list",
             "named": true
           }
         ]
@@ -6050,6 +5983,73 @@
         },
         {
           "type": "try",
+          "named": true
+        },
+        {
+          "type": "while",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "statement_list",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": true,
+      "types": [
+        {
+          "type": "break_statement",
+          "named": true
+        },
+        {
+          "type": "continue_statement",
+          "named": true
+        },
+        {
+          "type": "declaration",
+          "named": true
+        },
+        {
+          "type": "do_statement",
+          "named": true
+        },
+        {
+          "type": "enclosed_body",
+          "named": true
+        },
+        {
+          "type": "expression_statement",
+          "named": true
+        },
+        {
+          "type": "for",
+          "named": true
+        },
+        {
+          "type": "goto_statement",
+          "named": true
+        },
+        {
+          "type": "if",
+          "named": true
+        },
+        {
+          "type": "labeled_statement",
+          "named": true
+        },
+        {
+          "type": "return",
+          "named": true
+        },
+        {
+          "type": "switch",
+          "named": true
+        },
+        {
+          "type": "type_definition",
           "named": true
         },
         {
