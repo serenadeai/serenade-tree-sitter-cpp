@@ -4877,12 +4877,8 @@
                 "value": "case"
               },
               {
-                "type": "FIELD",
-                "name": "condition",
-                "content": {
-                  "type": "SYMBOL",
-                  "name": "expression_"
-                }
+                "type": "SYMBOL",
+                "name": "condition_optional"
               }
             ]
           },
@@ -4911,6 +4907,14 @@
             ]
           }
         ]
+      }
+    },
+    "condition_optional": {
+      "type": "FIELD",
+      "name": "condition",
+      "content": {
+        "type": "SYMBOL",
+        "name": "expression_"
       }
     },
     "case_statement_list": {

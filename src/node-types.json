@@ -1017,17 +1017,17 @@
             "named": true
           }
         ]
-      },
-      "condition": {
-        "multiple": false,
-        "required": true,
-        "types": [
-          {
-            "type": "expression_",
-            "named": true
-          }
-        ]
       }
+    },
+    "children": {
+      "multiple": false,
+      "required": true,
+      "types": [
+        {
+          "type": "condition_optional",
+          "named": true
+        }
+      ]
     }
   },
   {
@@ -1586,6 +1586,22 @@
           "named": true
         }
       ]
+    }
+  },
+  {
+    "type": "condition_optional",
+    "named": true,
+    "fields": {
+      "condition": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "expression_",
+            "named": true
+          }
+        ]
+      }
     }
   },
   {
