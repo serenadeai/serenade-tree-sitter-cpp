@@ -4897,13 +4897,8 @@
                 "type": "FIELD",
                 "name": "case_statement_list",
                 "content": {
-                  "type": "ALIAS",
-                  "content": {
-                    "type": "SYMBOL",
-                    "name": "case_statement_list"
-                  },
-                  "named": true,
-                  "value": "statement_list"
+                  "type": "SYMBOL",
+                  "name": "case_statement_list"
                 }
               },
               {
@@ -4959,13 +4954,8 @@
                 "type": "FIELD",
                 "name": "case_statement_list",
                 "content": {
-                  "type": "ALIAS",
-                  "content": {
-                    "type": "SYMBOL",
-                    "name": "case_statement_list"
-                  },
-                  "named": true,
-                  "value": "statement_list"
+                  "type": "SYMBOL",
+                  "name": "case_statement_list"
                 }
               },
               {
