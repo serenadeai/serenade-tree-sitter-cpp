@@ -1005,12 +1005,22 @@
     }
   },
   {
-    "type": "case_statement",
+    "type": "case",
     "named": true,
     "fields": {
-      "value": {
+      "case_statement_list": {
         "multiple": false,
         "required": false,
+        "types": [
+          {
+            "type": "statement_list",
+            "named": true
+          }
+        ]
+      },
+      "condition": {
+        "multiple": false,
+        "required": true,
         "types": [
           {
             "type": "expression_",
@@ -1018,68 +1028,6 @@
           }
         ]
       }
-    },
-    "children": {
-      "multiple": true,
-      "required": false,
-      "types": [
-        {
-          "type": "break_statement",
-          "named": true
-        },
-        {
-          "type": "continue_statement",
-          "named": true
-        },
-        {
-          "type": "declaration",
-          "named": true
-        },
-        {
-          "type": "do_statement",
-          "named": true
-        },
-        {
-          "type": "enclosed_body",
-          "named": true
-        },
-        {
-          "type": "expression_statement",
-          "named": true
-        },
-        {
-          "type": "for",
-          "named": true
-        },
-        {
-          "type": "goto_statement",
-          "named": true
-        },
-        {
-          "type": "if",
-          "named": true
-        },
-        {
-          "type": "labeled_statement",
-          "named": true
-        },
-        {
-          "type": "return",
-          "named": true
-        },
-        {
-          "type": "switch",
-          "named": true
-        },
-        {
-          "type": "type_definition",
-          "named": true
-        },
-        {
-          "type": "while",
-          "named": true
-        }
-      ]
     }
   },
   {
@@ -1970,6 +1918,22 @@
           "named": true
         }
       ]
+    }
+  },
+  {
+    "type": "default_case",
+    "named": true,
+    "fields": {
+      "case_statement_list": {
+        "multiple": false,
+        "required": false,
+        "types": [
+          {
+            "type": "statement_list",
+            "named": true
+          }
+        ]
+      }
     }
   },
   {
@@ -5951,11 +5915,15 @@
           "named": true
         },
         {
-          "type": "case_statement",
+          "type": "case",
           "named": true
         },
         {
           "type": "continue_statement",
+          "named": true
+        },
+        {
+          "type": "default_case",
           "named": true
         },
         {
@@ -6000,6 +5968,73 @@
         },
         {
           "type": "try",
+          "named": true
+        },
+        {
+          "type": "while",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "statement_list",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": true,
+      "types": [
+        {
+          "type": "break_statement",
+          "named": true
+        },
+        {
+          "type": "continue_statement",
+          "named": true
+        },
+        {
+          "type": "declaration",
+          "named": true
+        },
+        {
+          "type": "do_statement",
+          "named": true
+        },
+        {
+          "type": "enclosed_body",
+          "named": true
+        },
+        {
+          "type": "expression_statement",
+          "named": true
+        },
+        {
+          "type": "for",
+          "named": true
+        },
+        {
+          "type": "goto_statement",
+          "named": true
+        },
+        {
+          "type": "if",
+          "named": true
+        },
+        {
+          "type": "labeled_statement",
+          "named": true
+        },
+        {
+          "type": "return",
+          "named": true
+        },
+        {
+          "type": "switch",
+          "named": true
+        },
+        {
+          "type": "type_definition",
           "named": true
         },
         {
@@ -6210,12 +6245,12 @@
     "type": "switch",
     "named": true,
     "fields": {
-      "body": {
-        "multiple": false,
-        "required": true,
+      "switch_case_list": {
+        "multiple": true,
+        "required": false,
         "types": [
           {
-            "type": "enclosed_body",
+            "type": "top_level_item",
             "named": true
           }
         ]
