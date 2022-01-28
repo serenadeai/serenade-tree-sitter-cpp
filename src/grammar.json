@@ -4819,7 +4819,7 @@
         },
         {
           "type": "SYMBOL",
-          "name": "condition"
+          "name": "condition_optional"
         },
         {
           "type": "STRING",
@@ -4877,8 +4877,12 @@
                 "value": "case"
               },
               {
-                "type": "SYMBOL",
-                "name": "condition_optional"
+                "type": "FIELD",
+                "name": "condition",
+                "content": {
+                  "type": "SYMBOL",
+                  "name": "expression_"
+                }
               }
             ]
           },
@@ -4910,12 +4914,8 @@
       }
     },
     "condition_optional": {
-      "type": "FIELD",
-      "name": "condition",
-      "content": {
-        "type": "SYMBOL",
-        "name": "expression_"
-      }
+      "type": "SYMBOL",
+      "name": "condition"
     },
     "case_statement_list": {
       "type": "REPEAT1",
