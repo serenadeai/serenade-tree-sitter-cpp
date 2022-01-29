@@ -4925,21 +4925,25 @@
     "case_statement_list": {
       "type": "REPEAT1",
       "content": {
-        "type": "CHOICE",
-        "members": [
-          {
-            "type": "SYMBOL",
-            "name": "_non_case_statement"
-          },
-          {
-            "type": "SYMBOL",
-            "name": "declaration"
-          },
-          {
-            "type": "SYMBOL",
-            "name": "type_definition"
-          }
-        ]
+        "type": "FIELD",
+        "name": "statement",
+        "content": {
+          "type": "CHOICE",
+          "members": [
+            {
+              "type": "SYMBOL",
+              "name": "_non_case_statement"
+            },
+            {
+              "type": "SYMBOL",
+              "name": "declaration"
+            },
+            {
+              "type": "SYMBOL",
+              "name": "type_definition"
+            }
+          ]
+        }
       }
     },
     "default_case": {
